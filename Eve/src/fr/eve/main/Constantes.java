@@ -9,6 +9,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 
 public interface Constantes {
 	final EV3LargeRegulatedMotor mP = new EV3LargeRegulatedMotor(MotorPort.A);
+	
 	final EV3LargeRegulatedMotor mG = new EV3LargeRegulatedMotor(MotorPort.C);
 	final EV3LargeRegulatedMotor mD = new EV3LargeRegulatedMotor(MotorPort.B);
 	
