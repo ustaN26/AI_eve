@@ -1,4 +1,4 @@
-package fr.eve.main;
+package fr.eve.mainold;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;

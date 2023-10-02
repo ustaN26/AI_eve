@@ -1,4 +1,4 @@
-package fr.eve.main;
+package fr.eve.mainold;
 
 import lejos.hardware.BrickFinder;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
