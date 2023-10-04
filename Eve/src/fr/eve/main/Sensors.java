@@ -3,14 +3,6 @@ package fr.eve.main;
 import java.util.ArrayList;
 import java.util.List;
 
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.port.MotorPort;
-import lejos.hardware.port.SensorPort;
-import lejos.hardware.sensor.EV3ColorSensor;
-import lejos.hardware.sensor.EV3TouchSensor;
-import lejos.hardware.sensor.EV3UltrasonicSensor;
-import lejos.robotics.ColorIdentifier;
-
 public class Sensors implements Constantes{
 	private final List<Integer> colorBuffer = new ArrayList<>();
 	private int lastColor;

@@ -38,9 +38,9 @@ public class Activators implements Constantes {
 		picoMove(dir, mD.getMaxSpeed());
 	}
 	public void rotate(int angle) {
-		//TODO
+		
 	}
-    public void RotationRapide(int angle) {
+    public void rotationRapide(int angle) {
     	mG.startSynchronization();
         mG.rotate(angle);
         mD.rotate(-angle);
