@@ -16,7 +16,7 @@ public class Brain implements Constantes{
 		
 		brainThread = new Thread() {
 			public void run() {
-				detect();
+				
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			}

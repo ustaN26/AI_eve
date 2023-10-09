@@ -27,12 +27,19 @@ public class Activators implements Constantes {
 			public void run() {
 				if(synch) {
 					mG.setSpeed(speedG);
+					if(dirG) mG.forward();
+					else mG.backward();
 					mD.setSpeed(speedD);
+					if(dirD) mD.forward();
+					else mD.backward();
 				}
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			};
 		};
+	}
+	public void synch(boolean s) {
+		this.synch=s;
 	}
 	public void move(Boolean dir) {
 		picoMove(dir, mD.getMaxSpeed());

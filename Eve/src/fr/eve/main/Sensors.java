@@ -14,7 +14,7 @@ public class Sensors implements Constantes{
 	private final List<Integer> distBuffer = new ArrayList<>();
 	public List<Integer> getDistBuffer() { return distBuffer;}
 	
-	Thread flagTask, brainTask;
+	Thread flagTask;
 	public Sensors() {
 		colorListener(colorSensor.getColorID());
 		touchListener(false);
