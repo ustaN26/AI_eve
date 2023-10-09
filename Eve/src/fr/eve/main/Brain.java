@@ -11,11 +11,16 @@ public class Brain {
 		
 		brainThread = new Thread() {
 			public void run() {
-				
+				detectPalet();
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			}
 		};
 		brainThread.start();
+	}
+	
+	public void detectPalet() {
+		sensors.getDistBuffer().clear();
+		
 	}
 }

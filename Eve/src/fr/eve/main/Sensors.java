@@ -46,4 +46,6 @@ public class Sensors implements Constantes{
 		lastColor = color;
 		colorBuffer.add(color);
 	}
+	
+	
 }

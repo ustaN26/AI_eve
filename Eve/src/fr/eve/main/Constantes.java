@@ -6,6 +6,7 @@ import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.hardware.Sound;
 
 public interface Constantes {
 	final EV3LargeRegulatedMotor mP = new EV3LargeRegulatedMotor(MotorPort.A);
