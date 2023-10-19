@@ -11,8 +11,8 @@ public class Sensors implements Constantes{
 	private boolean touch;
 	public boolean isTouch() { return touch;}
 	
-	private final List<Integer> distBuffer = new ArrayList<>();
-	public List<Integer> getDistBuffer() { return distBuffer;}
+	private final List<Float> distBuffer = new ArrayList<>();
+	public List<Float> getDistBuffer() { return distBuffer;}
 	
 	Thread flagTask;
 	public Sensors() {
