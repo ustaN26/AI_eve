@@ -1,59 +1,62 @@
 package fr.eve.main;
 
-import lejos.hardware.BrickFinder;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.motor.Motor;
-import lejos.robotics.chassis.Chassis;
-import lejos.robotics.chassis.Wheel;
-import lejos.robotics.chassis.WheeledChassis;
-import lejos.robotics.localization.PoseProvider;
-import lejos.robotics.navigation.Move;
-import lejos.robotics.navigation.MovePilot;
 import lejos.utility.Delay;
-import lejos.utility.Matrix;
 
 public class Activators implements Constantes {
-	private MovePilot movePilot;
 	private float speedG, speedD;
 	private boolean dirG, dirD, synch;
 	private Thread moveTask;
 	
-	public Activators() {		
-		moveTask = new Thread() {
-			private void init() {
-		        mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
-		        mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
-			}
+	public Activators() {
+	    mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
+        moveTask = new Thread("moveTask") {
 			public void run() {
 				if(synch) {
-					mG.setSpeed(speedG);
+					mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
+			        mG.setSpeed(speedG);
 					if(dirG) mG.forward();
 					else mG.backward();
 					mD.setSpeed(speedD);
 					if(dirD) mD.forward();
 					else mD.backward();
+					mG.endSynchronization();
 				}
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			};
 		};
+		moveTask.start();
 	}
 	public void synch(boolean s) {
 		this.synch=s;
 	}
-	public void move(Boolean dir) {
-		picoMove(dir, mD.getMaxSpeed());
+	public void stop() {
+		picoMove(dirD, 0);
 	}
-	public void rotate(int angle) {
-		
+	public void move(boolean dir) {
+		picoMove(dir, maxSpeed);
 	}
-    public void rotationRapide(int angle) {
+	public void rotate(float angle) {
+		if(angle==0)
+			speedD=speedG=maxSpeed;
+		else if(angle>0) {
+			speedD = maxSpeed * Math.abs(angle)*(3.6f*5.7f/14)/100;
+			speedG = maxSpeed;
+		}
+		else{
+			speedG = maxSpeed * Math.abs(angle)*(3.6f*5.7f/14)/100;
+			speedD = maxSpeed;
+		}
+			
+	}
+    public void rotationRapide(int angle) {//TODO vrai angle
     	mG.startSynchronization();
         mG.rotate(angle);
         mD.rotate(-angle);
-        mG.endSynchronization();
         mG.waitComplete();
         mD.waitComplete();
+        mG.endSynchronization();
     }
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
