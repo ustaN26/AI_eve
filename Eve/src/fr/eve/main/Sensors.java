@@ -31,7 +31,8 @@ public class Sensors implements Constantes{
 					colorListener(Color.fromInt(colorSensor.getColorID()));
 				if((touchSensor.getCurrentMode()==1)!=touch)
 					touchListener((touchSensor.getCurrentMode()==1));
-				//distBuffer.add(); TODO
+	            sp.fetchSample(sample,0);
+				distBuffer.add(sample[0]);
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			}

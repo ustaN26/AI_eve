@@ -52,11 +52,11 @@ public class Activators implements Constantes {
 	}
     public void rotationRapide(int angle) {//TODO vrai angle
     	mG.startSynchronization();
-        mG.rotate(angle);
-        mD.rotate(-angle);
+        mG.rotate(angle*800/360);
+        mD.rotate(-angle*800/360);
+        mG.endSynchronization();
         mG.waitComplete();
         mD.waitComplete();
-        mG.endSynchronization();
     }
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
