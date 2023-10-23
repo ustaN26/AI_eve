@@ -10,10 +10,18 @@ import lejos.hardware.Sound;
 
 public interface Constantes {
 	final EV3LargeRegulatedMotor mP = new EV3LargeRegulatedMotor(MotorPort.A);
+	
 	final EV3LargeRegulatedMotor mG = new EV3LargeRegulatedMotor(MotorPort.C);
 	final EV3LargeRegulatedMotor mD = new EV3LargeRegulatedMotor(MotorPort.B);
+	final float maxSpeed = mG.getMaxSpeed();
 	
 	final EV3TouchSensor touchSensor = new EV3TouchSensor(SensorPort.S2);
 	final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
 	final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S4);
+	
+	final float maxUltrasonStep = 0.05f;
+	final float intervalDetectionCoef = 0.5f;
+	final float rayonPalet = 0.03f;
+	final int minNumbreOfValForDetect = 3;
+	final float maxUS_detect = 2.55f;
 }

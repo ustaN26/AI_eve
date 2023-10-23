@@ -12,6 +12,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.ColorIdentifier;
 
 public class Sensors implements Constantes{
+<<<<<<< HEAD
 	private final List<Integer> colorBuffer = new ArrayList<>();
 	private int lastColor;
 	public List<Integer> getColorBuffer() { return colorBuffer;}
@@ -22,14 +23,25 @@ public class Sensors implements Constantes{
 	private final List<Integer> distBuffer = new ArrayList<>();
 	public List<Integer> getDistBuffer() { return distBuffer;}
 
+=======
+	private final List<Color> colorBuffer = new ArrayList<>();
+	private Color lastColor = Color.BLANC;
+	public List<Color> getColorBuffer() { return colorBuffer;}
+	
+	private boolean touch;
+	public boolean isTouch() { return touch;}
+	
+	private final List<Float> distBuffer = new ArrayList<>();
+	public List<Float> getDistBuffer() { return distBuffer;}
+	
+>>>>>>> a628be30373662a03620d4db60ac53666c65019b
 	Thread flagTask, brainTask;
 	public Sensors() {
-		colorListener(colorSensor.getColorID());
 		touchListener(false);
 		Thread flagTask = new Thread() {
 			public void run() {
-				if(colorSensor.getColorID() != lastColor)
-					colorListener(colorSensor.getColorID());
+				if(Color.fromInt(colorSensor.getColorID()) != lastColor)
+					colorListener(Color.fromInt(colorSensor.getColorID()));
 				if((touchSensor.getCurrentMode()==1)!=touch)
 					touchListener((touchSensor.getCurrentMode()==1));
 				//distBuffer.add(); TODO
@@ -42,10 +54,11 @@ public class Sensors implements Constantes{
 	private void touchListener(boolean b) {
 		touch = b;
 	}
-	private void colorListener(int color) {
+	private void colorListener(Color color) {
 		lastColor = color;
 		colorBuffer.add(color);
 	}
+<<<<<<< HEAD
 
 	public enum Color {
 		BLUE(0), WHITE(1), BLACK(2), YELLOW(3), GREEN(4), RED(5), GREY(6);
@@ -69,4 +82,34 @@ public class Sensors implements Constantes{
 		}
 	}
 
+=======
+	public enum Color {
+
+	    BLANC(0), JAUNE(1), ROUGE(2), BLEU(3),VERT(4),NOIR(5),GRIS(6) ;
+
+
+	    private int value;
+
+	    private Color(int value) {
+	        this.value = value;
+	    }
+
+	    public int toInt() {
+	        return value;   
+	    }
+	    
+	    public static Color fromInt( int value ) {
+	        switch(value) {
+	            case 0: return BLANC;
+	            case 1: return JAUNE;
+	            case 2: return ROUGE;
+	            case 3: return BLEU;
+	            case 4: return VERT;
+	            case 5: return NOIR;
+	            default: return GRIS;
+	        }
+	    }
+	}    
+>>>>>>> a628be30373662a03620d4db60ac53666c65019b
 }
+
