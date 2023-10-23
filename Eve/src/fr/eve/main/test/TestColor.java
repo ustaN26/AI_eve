@@ -4,9 +4,9 @@ import fr.eve.main.Activators;
 import fr.eve.main.Sensors;
 import fr.eve.main.Sensors.Color;
 
-public class TestColo {
+public class TestColor {
 
-	public TestColo() {
+	public TestColor() {
 		// TODO Auto-generated constructor stub
 	}
 	public static void main(String... strings) {

@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import fr.eve.main.Detectable.Type;
+import lejos.hardware.Brick;
+import lejos.hardware.BrickFinder;
+import lejos.hardware.Button;
+import lejos.hardware.Key;
+import lejos.hardware.KeyListener;
 
 public class Brain implements Constantes{
 	private Activators activators;
@@ -18,7 +23,14 @@ public class Brain implements Constantes{
 		state = Etats.AcheminerPallet;
 		activators = new Activators();
 		sensors = new Sensors();
-
+		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
+			@Override // boutton arret d'urgance
+			public void keyReleased(Key k) {
+				System.exit(0);
+			}
+			@Override
+			public void keyPressed(Key k) {}
+		});
 		brainThread = new Thread() {
 			public void run() {
 <<<<<<< HEAD
@@ -46,11 +58,12 @@ public class Brain implements Constantes{
 	public List<Detectable> detect() {
 		List<Detectable> ret = new ArrayList<>();
 		sensors.getDistBuffer().clear();
-		activators.rotationRapide(800);
+		activators.rotationRapide(360);
 		List<Float> temp = new ArrayList<>(sensors.getDistBuffer());
 		Map<Float,Float> dist_angle_temp = new HashMap<>();
 		float anglePerVal = dist_angle_temp.size()/360;
 		for(int i = 0;i<sensors.getDistBuffer().size();i++){
+			System.out.println("data "+i+" , dist "+temp.get(i));
 			dist_angle_temp.put(i*anglePerVal,temp.get(i));
 		}
 		final List<Map<Float,Float>> packets = new ArrayList<>();
