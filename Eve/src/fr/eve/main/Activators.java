@@ -7,6 +7,7 @@ public class Activators implements Constantes {
 	private float speedG, speedD;
 	private boolean dirG, dirD, synch;
 	private Thread moveTask;
+	private boolean pinceOuverte= false;
 	
 	public Activators() {
 	    mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
@@ -31,11 +32,24 @@ public class Activators implements Constantes {
 	public void synch(boolean s) {
 		this.synch=s;
 	}
+<<<<<<< HEAD
+	public void monven(Boolean dir) {
+
+	}
+	public void rotate(int angle) {
+		//TODO
+	}
+	public void hardRotate(int angle) {
+		//TODO
+		mD.stop();
+		mG.stop();
+=======
 	public void stop() {
 		picoMove(dirD, 0);
 	}
 	public void move(boolean dir) {
 		picoMove(dir, maxSpeed);
+>>>>>>> a628be30373662a03620d4db60ac53666c65019b
 	}
 	public void rotate(float angle) {
 		if(angle==0)
@@ -62,6 +76,31 @@ public class Activators implements Constantes {
 		dirD=dirG=avancer;
 		speedD=speedG=vit;
 	}
+<<<<<<< HEAD
+	public void stop() {
+		speedD=speedG=0;
+	}
+	
+	/*
+	 * Manipule l'ouverture des pinces, ne permet pas de faire la même action deux d'affiler
+	 * PinceOuverte(True) : Ouvre les pinces
+	 * PinceOuverte(False) : Ferme les pinces 
+	 * Aide au valeur du moter : 
+	 * Valeur dans les positifs ça va forward => Fermé vers ouverte
+	 * Valeur dans les négatifs ca va backward => Ouverte vers fermé
+	 */
+	public void ouverturePince(boolean b) {
+		if (b==true && pinceOuverte==false) {
+			mP.rotate(900);
+			pinceOuverte=false;
+		}
+		if (b==false && pinceOuverte==true) {
+			mP.rotate(-900);
+			pinceOuverte=true;
+		} 
+		
+	}
+=======
     public void Avancer(int temps) { //temps en millisecondes 
     	mG.startSynchronization();
         mG.forward();
@@ -97,4 +136,5 @@ public class Activators implements Constantes {
         RotationDroite(45);
         Avancer(5000);
     }*/
+>>>>>>> a628be30373662a03620d4db60ac53666c65019b
 }
