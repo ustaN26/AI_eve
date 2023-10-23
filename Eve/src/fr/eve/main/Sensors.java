@@ -15,13 +15,13 @@ public class Sensors implements Constantes{
 	private final List<Integer> colorBuffer = new ArrayList<>();
 	private int lastColor;
 	public List<Integer> getColorBuffer() { return colorBuffer;}
-	
+
 	private boolean touch;
 	public boolean isTouch() { return touch;}
-	
+
 	private final List<Integer> distBuffer = new ArrayList<>();
 	public List<Integer> getDistBuffer() { return distBuffer;}
-	
+
 	Thread flagTask, brainTask;
 	public Sensors() {
 		colorListener(colorSensor.getColorID());
@@ -46,6 +46,27 @@ public class Sensors implements Constantes{
 		lastColor = color;
 		colorBuffer.add(color);
 	}
-	
-	
+
+	public enum Color {
+		BLUE(0), WHITE(1), BLACK(2), YELLOW(3), GREEN(4), RED(5), GREY(6);
+		private int value;
+		private Color (int value) {
+			this.value = value;
+		}
+		public int toInt() {
+			return value;
+		}
+		public static Color fromInt (int value) {
+			switch(value) {
+			case 0 : return BLUE;
+			case 1 : return WHITE;
+			case 2 : return BLACK;
+			case 3 : return YELLOW;
+			case 4 : return GREEN;
+			case 5 : return RED;
+			default : return GREY;
+			}
+		}
+	}
+
 }

@@ -50,7 +50,7 @@ public class Activators implements Constantes {
 	 * Valeur dans les positifs ça va forward => Fermé vers ouverte
 	 * Valeur dans les négatifs ca va backward => Ouverte vers fermé
 	 */
-	public void pinceOuverte(boolean b) {
+	public void ouverturePince(boolean b) {
 		if (b==true && pinceOuverte==false) {
 			mP.rotate(900);
 			pinceOuverte=false;
@@ -58,6 +58,7 @@ public class Activators implements Constantes {
 		if (b==false && pinceOuverte==true) {
 			mP.rotate(-900);
 			pinceOuverte=true;
-		}
+		} 
+		
 	}
 }

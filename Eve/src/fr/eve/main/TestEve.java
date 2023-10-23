@@ -22,10 +22,7 @@ public class TestEve implements Constantes {
 	public static void main(String[] args) {
 		// dans les positifs ça va forward => Ouvre
 		// dans les négatifs ca va backward => Ferme
-		mP.rotate(900);
-		//BrickFinder.getDefault().getGraphicsLCD().drawString(Float.toString(mP.getPosition()),0,0,0);
-		
-
+		mP.rotate(-900);
 	}
 
 }
