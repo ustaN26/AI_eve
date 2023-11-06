@@ -33,16 +33,12 @@ public class Brain implements Constantes{
 		});
 		brainThread = new Thread() {
 			public void run() {
-<<<<<<< HEAD
-				detectPalet();
-=======
 				switch(state) {
 					case AcheminerPallet :
 						break;
 					case RecherchePallet :
 						break;
 				}
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
 				try { Thread.sleep(1);
 				} catch (InterruptedException ignored) {}
 			}
@@ -50,11 +46,6 @@ public class Brain implements Constantes{
 		brainThread.start();
 	}
 	
-<<<<<<< HEAD
-	public void detectPalet() {
-		sensors.getDistBuffer().clear();
-		
-=======
 	public List<Detectable> detect() {
 		List<Detectable> ret = new ArrayList<>();
 		sensors.getDistBuffer().clear();
@@ -133,7 +124,6 @@ public class Brain implements Constantes{
 			if(e.getValue()<min.getValue())min=e;
 		}
 		return min;
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
 	}
 }
 

@@ -12,20 +12,8 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.ColorIdentifier;
 
 public class Sensors implements Constantes{
-<<<<<<< HEAD
-	private final List<Integer> colorBuffer = new ArrayList<>();
-	private int lastColor;
-	public List<Integer> getColorBuffer() { return colorBuffer;}
-
-	private boolean touch;
-	public boolean isTouch() { return touch;}
-
-	private final List<Integer> distBuffer = new ArrayList<>();
-	public List<Integer> getDistBuffer() { return distBuffer;}
-
-=======
 	private final List<Color> colorBuffer = new ArrayList<>();
-	private Color lastColor = Color.BLANC;
+	private static Color lastColor = Color.WHITE; //J'ai mis en static pour referencer direct
 	public List<Color> getColorBuffer() { return colorBuffer;}
 	
 	private boolean touch;
@@ -34,7 +22,6 @@ public class Sensors implements Constantes{
 	private final List<Float> distBuffer = new ArrayList<>();
 	public List<Float> getDistBuffer() { return distBuffer;}
 	
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
 	Thread flagTask, brainTask;
 	public Sensors() {
 		touchListener(false);
@@ -59,35 +46,12 @@ public class Sensors implements Constantes{
 		lastColor = color;
 		colorBuffer.add(color);
 	}
-<<<<<<< HEAD
-
-	public enum Color {
-		BLUE(0), WHITE(1), BLACK(2), YELLOW(3), GREEN(4), RED(5), GREY(6);
-		private int value;
-		private Color (int value) {
-			this.value = value;
-		}
-		public int toInt() {
-			return value;
-		}
-		public static Color fromInt (int value) {
-			switch(value) {
-			case 0 : return BLUE;
-			case 1 : return WHITE;
-			case 2 : return BLACK;
-			case 3 : return YELLOW;
-			case 4 : return GREEN;
-			case 5 : return RED;
-			default : return GREY;
-			}
-		}
+	public static Color getLastColor() {
+		return lastColor;
 	}
-
-=======
+	
 	public enum Color {
-
-	    BLANC(0), JAUNE(1), ROUGE(2), BLEU(3),VERT(4),NOIR(5),GRIS(6) ;
-
+	    BLUE(0), WHITE(1), BLACK(2), YELLOW(3), GREEN(4), RED(5), GREY(6);
 
 	    private int value;
 
@@ -96,21 +60,17 @@ public class Sensors implements Constantes{
 	    }
 
 	    public int toInt() {
-	        return value;   
+	        return value;
 	    }
-	    
-	    public static Color fromInt( int value ) {
-	        switch(value) {
-	            case 0: return BLANC;
-	            case 1: return JAUNE;
-	            case 2: return ROUGE;
-	            case 3: return BLEU;
-	            case 4: return VERT;
-	            case 5: return NOIR;
-	            default: return GRIS;
+
+	    public static Color fromInt(int value) {
+	        for (Color color : Color.values()) {
+	            if (color.toInt() == value) {
+	                return color;
+	            }
 	        }
+	        return GREY;
 	    }
-	}    
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
+	}
 }
 

@@ -1,5 +1,6 @@
 package fr.eve.main;
 
+import fr.eve.main.Sensors.Color;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
@@ -32,24 +33,11 @@ public class Activators implements Constantes {
 	public void synch(boolean s) {
 		this.synch=s;
 	}
-<<<<<<< HEAD
-	public void monven(Boolean dir) {
-
-	}
-	public void rotate(int angle) {
-		//TODO
-	}
-	public void hardRotate(int angle) {
-		//TODO
-		mD.stop();
-		mG.stop();
-=======
 	public void stop() {
 		picoMove(dirD, 0);
 	}
 	public void move(boolean dir) {
 		picoMove(dir, maxSpeed);
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
 	}
 	public void rotate(float angle) {
 		if(angle==0)
@@ -76,11 +64,6 @@ public class Activators implements Constantes {
 		dirD=dirG=avancer;
 		speedD=speedG=vit;
 	}
-<<<<<<< HEAD
-	public void stop() {
-		speedD=speedG=0;
-	}
-	
 	/*
 	 * Manipule l'ouverture des pinces, ne permet pas de faire la même action deux d'affiler
 	 * PinceOuverte(True) : Ouvre les pinces
@@ -90,7 +73,7 @@ public class Activators implements Constantes {
 	 * Valeur dans les négatifs ca va backward => Ouverte vers fermé
 	 */
 	public void ouverturePince(boolean b) {
-		if (b==true && pinceOuverte==false) {
+		if (b && !pinceOuverte) {
 			mP.rotate(900);
 			pinceOuverte=false;
 		}
@@ -98,9 +81,12 @@ public class Activators implements Constantes {
 			mP.rotate(-900);
 			pinceOuverte=true;
 		} 
-		
 	}
-=======
+	public void avancerAvecPinces(int temps) {
+        while (pinceOuverte) {
+           Avancer(temps);
+        }
+    }
     public void Avancer(int temps) { //temps en millisecondes 
     	mG.startSynchronization();
         mG.forward();
@@ -113,6 +99,15 @@ public class Activators implements Constantes {
         mG.endSynchronization();
     }
 
+    public void avancerJusqua () {
+    	//Faire pour les autres trucs qu'une couleur (quand on en aura besoin on rajoute)
+    	while (Sensors.getLastColor()!=Color.WHITE) {
+    		Avancer(100000);
+    	}
+    }
+    
+    
+    
     public void Reculer(int temps) {
     	mG.startSynchronization();
         mG.backward();
@@ -136,5 +131,6 @@ public class Activators implements Constantes {
         RotationDroite(45);
         Avancer(5000);
     }*/
->>>>>>> a628be30373662a03620d4db60ac53666c65019b
+    
+    
 }
