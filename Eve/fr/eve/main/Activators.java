@@ -10,6 +10,8 @@ public class Activators implements Constantes {
 	private Thread moveTask, pinceTask;
 	private boolean etatPince = false,ordrePince = false;//true = open; false = close
 	private int lastTachoG=0, lastTachoD=0;
+	private int boussole=0;
+	
 	public Activators() {
 	    mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
         moveTask = new Thread("moveTask") {
@@ -62,6 +64,7 @@ public class Activators implements Constantes {
 	}
 	
     public void rotationRapide(int angle) {//TODO vrai angle
+    	boussole=angle;
     	mG.setAcceleration(720);
 		mD.setAcceleration(720);
     	mG.startSynchronization();
@@ -70,6 +73,10 @@ public class Activators implements Constantes {
         mG.endSynchronization();
         mG.waitComplete();
         mD.waitComplete();
+    }
+    
+    public int getBoussole() {
+    	return boussole;
     }
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
@@ -86,7 +93,7 @@ public class Activators implements Constantes {
 	public void ouverturePince(boolean b) {
 		ordrePince = b;
 	}
-    public void Avancer(int temps) { //temps en millisecondes 
+    public void Avancer(int temps) {//temps en millisecondes 
     	mG.startSynchronization();
         mG.forward();
         mD.forward();
