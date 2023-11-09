@@ -60,22 +60,13 @@ public class Activators implements Constantes {
 	public void move(boolean dir) {
 		picoMove(dir, maxSpeed);
 	}
-	public void rotate(float angle) {
-		if(angle==0)
-			speedD=speedG=maxSpeed;
-		else if(angle>0) {
-			speedD = maxSpeed * Math.abs(angle)*(3.6f*5.7f/14)/100;
-			speedG = maxSpeed;
-		}
-		else{
-			speedG = maxSpeed * Math.abs(angle)*(3.6f*5.7f/14)/100;
-			speedD = maxSpeed;
-		}
-	}
+	
     public void rotationRapide(int angle) {//TODO vrai angle
+    	mG.setAcceleration(720);
+		mD.setAcceleration(720);
     	mG.startSynchronization();
-        mG.rotate(angle*800/360);
-        mD.rotate(-angle*800/360);
+    	mG.rotate((int)(angle*2.16));
+		mD.rotate((int)(-angle*2.16));
         mG.endSynchronization();
         mG.waitComplete();
         mD.waitComplete();
