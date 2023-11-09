@@ -154,20 +154,6 @@ public class Brain implements Constantes{
         }
     }
 	private void premierPalet() {
-		activators.move(true);
-        activators.ouverturePince(true);
-        avancerjusqua(sensors.isTouch());
-        activators.ouverturePince(false);
-        activators.rotate(45);
-        avancerjusqua(activators.reached(20));
-        activators.resetDist();
-        activators.rotate(-45);
-        avancerjusqua(activators.reached(20));
-        activators.resetDist();
-        activators.rotate(0);
-        avancerjusqua(activators.reached(110));
-        activators.resetDist();
-        activators.stop();
 	}
 	protected void marquerPalet() {
 		

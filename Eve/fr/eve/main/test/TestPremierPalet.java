@@ -4,6 +4,11 @@ import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
 import fr.eve.main.EVE;
 import fr.eve.main.Sensors;
+import fr.eve.main.Sensors.Color;
+import fr.eve.main.tester.ColorTest;
+import fr.eve.main.tester.DistanceTest;
+import fr.eve.main.tester.Tester;
+import fr.eve.main.tester.TouchTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
@@ -38,26 +43,23 @@ public class TestPremierPalet implements Constantes{
         activators.ouverturePince(false);
 		//premierPalet();    	
 	}
-    private void avancerjusqua(boolean test) {
-        while(test) {
+    public static void avancerjusqua(Tester t) {
+        while(t.test()) {
         	try { Thread.sleep(1);
 			} catch (InterruptedException ignored) {}
         }
     }
 	private void premierPalet() {
 		activators.synch(true);
-		activators.move(true);
         activators.ouverturePince(true);
-        avancerjusqua(sensors.isTouch());
+		activators.move(true);
+        avancerjusqua(new TouchTest(sensors));
         activators.ouverturePince(false);
-        activators.rotate(45);
-        avancerjusqua(activators.reached(20));
+        activators.rotationRapide(45);
+        avancerjusqua(new DistanceTest(20, activators));
         activators.resetDist();
-        activators.rotate(-45);
-        avancerjusqua(activators.reached(20));
-        activators.resetDist();
-        activators.rotate(0);
-        avancerjusqua(activators.reached(110));
+        activators.rotationRapide(-45);
+        avancerjusqua(new ColorTest(Color.WHITE));
         activators.resetDist();
         activators.stop();
         marquerPalet();
