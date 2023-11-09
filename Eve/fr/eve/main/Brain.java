@@ -158,13 +158,13 @@ public class Brain implements Constantes{
         activators.ouverturePince(true);
         avancerjusqua(sensors.isTouch());
         activators.ouverturePince(false);
-        activators.rotate(45);
+        activators.rotationRapide(45);
         avancerjusqua(activators.reached(20));
         activators.resetDist();
-        activators.rotate(-45);
+        activators.rotationRapide(-45);
         avancerjusqua(activators.reached(20));
         activators.resetDist();
-        activators.rotate(0);
+        activators.droitDevant();
         avancerjusqua(activators.reached(110));
         activators.resetDist();
         activators.stop();

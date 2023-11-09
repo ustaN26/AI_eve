@@ -75,9 +75,11 @@ public class Activators implements Constantes {
         mD.waitComplete();
     }
     
-    public int getBoussole() {
-    	return boussole;
+    public void droitDevant() {
+    	rotationRapide(-boussole);
     }
+    
+    
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
 		speedD=speedG=vit;
