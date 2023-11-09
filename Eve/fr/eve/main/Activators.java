@@ -5,30 +5,51 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
 public class Activators implements Constantes {
-	private float speedG, speedD;
-	private boolean dirG, dirD, synch;
-	private Thread moveTask;
-	private boolean pinceOuverte= false;
-	
+	private float speedG=0, speedD=0;
+	private boolean dirG=true, dirD=true, synch=true;
+	private Thread moveTask, pinceTask;
+	private boolean etatPince = false,ordrePince = false;//true = open; false = close
+	private int lastTachoG=0, lastTachoD=0;
 	public Activators() {
 	    mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
         moveTask = new Thread("moveTask") {
 			public void run() {
-				if(synch) {
-					mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
-			        mG.setSpeed(speedG);
-					if(dirG) mG.forward();
-					else mG.backward();
-					mD.setSpeed(speedD);
-					if(dirD) mD.forward();
-					else mD.backward();
-					mG.endSynchronization();
+				while(true) {
+					if(synch) {
+						mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
+				        mG.setSpeed(speedG);
+						mD.setSpeed(speedD);
+						if(dirG) mG.forward();
+						else mG.backward();
+						if(dirD) mD.forward();
+						else mD.backward();
+						mG.endSynchronization();
+						calcDistParcourue();
+					}
+					try { Thread.sleep(1);
+					} catch (InterruptedException ignored) {}
 				}
-				try { Thread.sleep(1);
-				} catch (InterruptedException ignored) {}
+			};
+		};
+		pinceTask = new Thread("pinceTask") {
+			public void run() {
+				while(true) {
+					if(etatPince!=ordrePince) {
+						if (ordrePince) {
+							mP.rotate(-900);
+							etatPince=true;
+						}else{
+							mP.rotate(-900);
+							etatPince=false;
+						} 
+					}
+					try { Thread.sleep(1);
+					} catch (InterruptedException ignored) {}
+				}
 			};
 		};
 		moveTask.start();
+		pinceTask.start();
 	}
 	public void synch(boolean s) {
 		this.synch=s;
@@ -50,7 +71,6 @@ public class Activators implements Constantes {
 			speedG = maxSpeed * Math.abs(angle)*(3.6f*5.7f/14)/100;
 			speedD = maxSpeed;
 		}
-			
 	}
     public void rotationRapide(int angle) {//TODO vrai angle
     	mG.startSynchronization();
@@ -73,20 +93,8 @@ public class Activators implements Constantes {
 	 * Valeur dans les négatifs ca va backward => Ouverte vers fermé
 	 */
 	public void ouverturePince(boolean b) {
-		if (b && !pinceOuverte) {
-			mP.rotate(900);
-			pinceOuverte=false;
-		}
-		if (b==false && pinceOuverte==true) {
-			mP.rotate(-900);
-			pinceOuverte=true;
-		} 
+		ordrePince = b;
 	}
-	public void avancerAvecPinces(int temps) {
-        while (pinceOuverte) {
-           Avancer(temps);
-        }
-    }
     public void Avancer(int temps) { //temps en millisecondes 
     	mG.startSynchronization();
         mG.forward();
@@ -99,38 +107,23 @@ public class Activators implements Constantes {
         mG.endSynchronization();
     }
 
-    public void avancerJusqua () {
+    public void avancerJusquaCouleur(Color c) {
     	//Faire pour les autres trucs qu'une couleur (quand on en aura besoin on rajoute)
-    	while (Sensors.getLastColor()!=Color.WHITE) {
+    	while (Sensors.getLastColor()!=c) {
     		Avancer(100000);
     	}
     }
     
-    
-    
-    public void Reculer(int temps) {
-    	mG.startSynchronization();
-        mG.backward();
-        mD.backward();
-        mG.endSynchronization();
-        Delay.msDelay(temps);
-    	mG.startSynchronization();
-        mG.close();
-        mD.close();
-        mG.endSynchronization();
-    }
-
-    public void RotationDroite(int angle) {
-        mG.rotate(angle);
-    }
-
-    public  void RotationGauche(int angle) {
-        mD.rotate(angle);
-    }
-/*  public  void AvancerDiago() {
-        RotationDroite(45);
-        Avancer(5000);
-    }*/
-    
-    
+	private int distanceParcourue = 0;
+	public boolean reached(int dist) {
+		return dist>=distanceParcourue;
+	}
+	private void calcDistParcourue() {
+	    int g = mG.getTachoCount()-lastTachoG;
+	    int d = mD.getTachoCount()-lastTachoD;
+	    distanceParcourue+=(Math.PI*6/360)*(g+d)/2;// (2*PI*r/360) *degres parcourus 
+	}
+	public void resetDist() {
+		distanceParcourue=0;
+	}
 }

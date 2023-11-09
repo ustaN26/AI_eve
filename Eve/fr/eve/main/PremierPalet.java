@@ -28,10 +28,10 @@ public class PremierPalet implements Constantes {
 		rotation=-20;
 	}
 	public void avancerAvecPinces() {
-        a.avancerAvecPinces(distance/vitesse*1000);
+   //     a.avancerAvecPinces(distance/vitesse*1000);
     }
 	 public void avancerJusqua () {
-		 a.avancerJusqua();
+	//	 a.avancerJusqua();
 	 }
 
    

@@ -1,5 +1,6 @@
 package fr.eve.main;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 public class Detectable {
@@ -34,6 +35,17 @@ public class Detectable {
 		palet,
 		robot,
 		ignored
+	}
+	public static Detectable getClosestPalet(List<Detectable> detect) {
+		float minDist = 1000;
+		Detectable r = null;
+		for(Detectable d : detect) {
+			if(d.type == Type.palet && d.distance<minDist) {
+				r = d;
+				minDist = d.distance;
+			}
+		}
+		return r;
 	}
 }
 

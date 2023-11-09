@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import fr.eve.main.Detectable.Type;
-import lejos.hardware.Brick;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
@@ -16,11 +15,15 @@ import lejos.hardware.KeyListener;
 public class Brain implements Constantes{
 	private Activators activators;
 	private Sensors sensors;
+
+	public Sensors getSensor() {
+		return sensors;
+	}
 	private Thread brainThread;
 	private Etats state;
 
 	public Brain() {
-		state = Etats.AcheminerPallet;
+		state = Etats.PremierPalet;
 		activators = new Activators();
 		sensors = new Sensors();
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
@@ -33,19 +36,31 @@ public class Brain implements Constantes{
 		});
 		brainThread = new Thread() {
 			public void run() {
-				switch(state) {
-					case AcheminerPallet :
+				while(true) {
+					switch(state) {
+						case PremierPalet:
+							premierPalet();
+						case MarquerPalet:
+							marquerPalet();
+							break;
+						case AcheminerPalet :
+							AcheminerPalet();
+							break;
+						case DetectPalet :
+							detecterPalet();
+							break;
+					default:
 						break;
-					case RecherchePallet :
-						break;
+					}
+					try { Thread.sleep(1);
+					} catch (InterruptedException ignored) {}	
 				}
-				try { Thread.sleep(1);
-				} catch (InterruptedException ignored) {}
 			}
 		};
 		brainThread.start();
+		while(true);
 	}
-	
+
 	public List<Detectable> detect() {
 		List<Detectable> ret = new ArrayList<>();
 		sensors.getDistBuffer().clear();
@@ -117,13 +132,52 @@ public class Brain implements Constantes{
 			}
 		return ret;
 	}
-	
 	private Entry<Float,Float> min(Map<Float,Float> packet) {
 		Entry<Float,Float> min = new AbstractMap.SimpleEntry<>(3f, 0f);//2.55 max);
 		for(Entry<Float, Float> e : packet.entrySet()) {
 			if(e.getValue()<min.getValue())min=e;
 		}
 		return min;
+	}
+	private static enum Etats {
+		PremierPalet,
+		MarquerPalet,
+		DetectPalet,
+		PrendrePalet,
+		AcheminerPalet;
+	}
+
+    private void avancerjusqua(boolean test) {
+        while(test) {
+        	try { Thread.sleep(1);
+			} catch (InterruptedException ignored) {}
+        }
+    }
+	private void premierPalet() {
+		activators.move(true);
+        activators.ouverturePince(true);
+        avancerjusqua(sensors.isTouch());
+        activators.ouverturePince(false);
+        activators.rotate(45);
+        avancerjusqua(activators.reached(20));
+        activators.resetDist();
+        activators.rotate(-45);
+        avancerjusqua(activators.reached(20));
+        activators.resetDist();
+        activators.rotate(0);
+        avancerjusqua(activators.reached(110));
+        activators.resetDist();
+        activators.stop();
+	}
+	protected void marquerPalet() {
+		
+	}
+	private void AcheminerPalet() {
+        
+	}
+	protected void detecterPalet() {
+		Detectable palet = Detectable.getClosestPalet(detect());
+		
 	}
 }
 
