@@ -13,8 +13,24 @@ public class Activators implements Constantes {
 	private int boussole=0;
 	
 	public Activators() {
-	    mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
-        moveTask = new Thread("moveTask") {
+		boolean ok = false;
+		int essais = 0;
+		while(ok) {
+			try {
+				mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
+				ok=true;
+			}catch (Exception e) {
+				essais++;
+				if(essais>=5) {
+					System.out.println("impossible de synchroniser les moteurs");
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException ignored) {}
+					System.exit(0);
+				}
+			}
+		}
+	    moveTask = new Thread("moveTask") {
 			public void run() {
 				while(true) {
 					if(synch) {
@@ -116,14 +132,18 @@ public class Activators implements Constantes {
     
 	private int distanceParcourue = 0;
 	public boolean reached(int dist) {
+		calcDistParcourue();
 		return dist>=distanceParcourue;
 	}
 	private void calcDistParcourue() {
 	    int g = mG.getTachoCount()-lastTachoG;
 	    int d = mD.getTachoCount()-lastTachoD;
-	    distanceParcourue+=(Math.PI*6/360)*(g+d)/2;// (2*PI*r/360) *degres parcourus 
+	    distanceParcourue+=(((3.14*57/360)*2*(g+d)/2)/2);// (2*PI*r/360) *degres parcourus 
 	}
 	public void resetDist() {
 		distanceParcourue=0;
+	}
+	public int dist() {
+		return distanceParcourue;
 	}
 }
