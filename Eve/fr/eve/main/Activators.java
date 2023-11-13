@@ -10,6 +10,8 @@ public class Activators implements Constantes {
 	private Thread moveTask, pinceTask;
 	private boolean etatPince = false,ordrePince = false;//true = open; false = close
 	private int lastTachoG=0, lastTachoD=0;
+	private int boussole=0;
+	
 	public Activators() {
 		boolean ok = false;
 		int essais = 0;
@@ -78,6 +80,7 @@ public class Activators implements Constantes {
 	}
 	
     public void rotationRapide(int angle) {//TODO vrai angle
+    	boussole=angle;
     	mG.setAcceleration(720);
 		mD.setAcceleration(720);
     	mG.startSynchronization();
@@ -87,6 +90,12 @@ public class Activators implements Constantes {
         mG.waitComplete();
         mD.waitComplete();
     }
+    
+    public void droitDevant() {
+    	rotationRapide(-boussole);
+    }
+    
+    
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
 		speedD=speedG=vit;
@@ -102,7 +111,7 @@ public class Activators implements Constantes {
 	public void ouverturePince(boolean b) {
 		ordrePince = b;
 	}
-    public void Avancer(int temps) { //temps en millisecondes 
+    public void Avancer(int temps) {//temps en millisecondes 
     	mG.startSynchronization();
         mG.forward();
         mD.forward();
