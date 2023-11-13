@@ -1,5 +1,8 @@
 package fr.eve.main;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +14,8 @@ import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
+import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class Brain implements Constantes{
 	private Activators activators;
@@ -179,6 +184,55 @@ public class Brain implements Constantes{
 		Detectable palet = Detectable.getClosestPalet(detect());
 		
 	}
+	
+
+ public void detection360() throws IOException{
+     String s="";
+        FileOutputStream f=new FileOutputStream("valeur.txt");
+        mG.setSpeed(130); //125 pour 31700
+        mD.setSpeed(130);
+        activators.synch(true);
+        mG.forward();
+        mD.backward();
+        activators.synch(false);
+        float g=0;
+        int nbVal=0;
+        for(int i=0;i<360;i++) {
+            for(int j=0;j<20;j++) {
+                float t= sensors.getData();
+                if(t<3) 
+                g+=t;
+                nbVal++;
+            }
+            if(g==0) {
+                g=3;
+            }
+            else {
+            g=g/nbVal;
+            }
+            s =""+ g;
+            f.write((s+"\n").getBytes());
+            g=0;
+            nbVal=0;
+            Delay.usDelay(12000);
+        }
+        activators.synch(true);
+        mG.stop();
+        mD.stop();
+        activators.synch(false);
+        f.flush();
+        f.close();
+    }
+
+ public float[] tabValeur() throws IOException {
+     float[] valeur= new float[360];
+     FileInputStream f=new FileInputStream("valeur.txt");
+     for(int i=0;i<360;i++) {
+         valeur[i]=f.read();
+     }
+     f.close();
+     return valeur;
+ }
 }
 
 
