@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import fr.eve.main.Detectable.Type;
+import fr.eve.main.test.TestPremierPalet;
+import fr.eve.main.tester.DistanceTest;
+import fr.eve.main.tester.IRTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
@@ -174,8 +177,12 @@ public class Brain implements Constantes{
     activators.stop();
 	}
 	protected void marquerPalet() {
-		
-	}
+		TestPremierPalet.avancerjusqua(new IRTest(2, sensors));//on verra pour la distance
+		 activators.ouverturePince(true);
+		 activators.move(false);
+		 TestPremierPalet.avancerjusqua(new DistanceTest(150,activators));
+		 activators.rotationRapide(180);
+	 }
 	private void AcheminerPalet() {
         
 	}
@@ -261,6 +268,7 @@ public class Brain implements Constantes{
          return (i+j)/2;
      else return -1;
  }
+
 }
 
 

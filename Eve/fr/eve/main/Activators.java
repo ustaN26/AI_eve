@@ -54,7 +54,7 @@ public class Activators implements Constantes {
 				while(true) {
 					if(etatPince!=ordrePince) {
 						if (ordrePince) {
-							mP.rotate(-900);
+							mP.rotate(900);
 							etatPince=true;
 						}else{
 							mP.rotate(-900);
