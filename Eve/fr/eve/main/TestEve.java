@@ -1,6 +1,5 @@
 package fr.eve.main;
 
-import fr.eve.main.Sensors.Color;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 

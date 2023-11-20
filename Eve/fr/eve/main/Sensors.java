@@ -2,15 +2,21 @@ package fr.eve.main;
 
 import java.util.ArrayList;
 import java.util.List;
+import lejos.robotics.SampleProvider;
 
-public class Sensors implements Constantes{	
-	private boolean touch = false;
+public class Sensors implements Constantes{
+	private boolean touch;
 	public boolean isTouch() { return touch;}
 	
 	private final List<Float> distBuffer = new ArrayList<>();
 	public List<Float> getDistBuffer() { return distBuffer;}
 	
-	Thread flagTask, brainTask;
+	public float getData() {
+        SampleProvider sampleProvider=usSensor.getDistanceMode();
+        float[] sample=new float[sampleProvider.sampleSize()];
+        sampleProvider.fetchSample(sample, 0); 
+        return sample[0];
+    }
 	public Sensors() {
 		touchListener(false);
 		Thread flagTask = new Thread() {

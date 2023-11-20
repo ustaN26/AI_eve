@@ -1,11 +1,8 @@
 package fr.eve.main.test;
-
 import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
 import fr.eve.main.EVE;
 import fr.eve.main.Sensors;
-import fr.eve.main.Sensors.Color;
-import fr.eve.main.tester.ColorTest;
 import fr.eve.main.tester.DistanceTest;
 import fr.eve.main.tester.Tester;
 import fr.eve.main.tester.TouchTest;
@@ -56,7 +53,7 @@ public class TestPremierPalet implements Constantes{
 	    activators.resetDist();
 		activators.move(true);
 	    activators.droitDevant();
-	    avancerjusqua(new ColorTest(Color.WHITE,sensors));
+	    //avancerjusqua(new ColorTest(Color.WHITE,sensors));
 	    activators.resetDist();
 	    activators.stop();
 	}

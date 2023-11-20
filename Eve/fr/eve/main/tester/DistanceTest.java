@@ -2,7 +2,7 @@ package fr.eve.main.tester;
 
 import fr.eve.main.Activators;
 
-public class DistanceTest implements Tester{
+public class DistanceTest implements Tester {
 	private int dist;
 	private Activators a;
 	
