@@ -36,7 +36,7 @@ public class TestPince implements Constantes{
 		}
 		mP.rotate(900);
 		//activators.ouverturePince(false);
-		//premierPalet();    	
+		//premierPalet(); 
 	}
 
 }

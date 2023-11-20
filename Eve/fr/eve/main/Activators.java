@@ -54,7 +54,7 @@ public class Activators implements Constantes {
 				while(true) {
 					if(etatPince!=ordrePince) {
 						if (ordrePince) {
-							mP.rotate(-900);
+							mP.rotate(900);
 							etatPince=true;
 						}else{
 							mP.rotate(-900);
@@ -123,12 +123,7 @@ public class Activators implements Constantes {
         mG.endSynchronization();
     }
 
-    public void avancerJusquaCouleur(Color c) {
-    	//Faire pour les autres trucs qu'une couleur (quand on en aura besoin on rajoute)
-    	while (Sensors.getLastColor()!=c) {
-    		Avancer(100000);
-    	}
-    }
+   
     
 	private int distanceParcourue = 0;
 	public boolean reached(int dist) {

@@ -1,5 +1,4 @@
 package fr.eve.main.test;
-
 import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
 import fr.eve.main.EVE;
