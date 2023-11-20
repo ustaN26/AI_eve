@@ -1,14 +1,13 @@
 package fr.eve.main;
 
-import fr.eve.main.Sensors.Color;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
 public class Activators implements Constantes {
 	private float speedG=0, speedD=0;
-	private boolean dirG=true, dirD=true, synch=true;
+	private boolean dirG=true, dirD=true, synch=false;
 	private Thread moveTask, pinceTask;
-	private boolean etatPince = false,ordrePince = false;//true = open; false = close
+	private boolean etatPince = false, ordrePince = false;//true = open; false = close
 	private int lastTachoG=0, lastTachoD=0;
 	private int boussole=0;
 	
@@ -73,14 +72,20 @@ public class Activators implements Constantes {
 		this.synch=s;
 	}
 	public void stop() {
-		picoMove(dirD, 0);
+		picoMove(true, 0);
+		synch(false);
+		mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
+		mG.stop();
+		mD.stop();
+		mG.endSynchronization();
 	}
 	public void move(boolean dir) {
+		synch(true);
 		picoMove(dir, maxSpeed);
 	}
 	
     public void rotationRapide(int angle) {//TODO vrai angle
-    	boussole=angle;
+    	boussole=(boussole+angle)%360;
     	mG.setAcceleration(720);
 		mD.setAcceleration(720);
     	mG.startSynchronization();
@@ -94,8 +99,7 @@ public class Activators implements Constantes {
     public void droitDevant() {
     	rotationRapide(-boussole);
     }
-    
-    
+        
 	public void picoMove(boolean avancer, float vit) {
 		dirD=dirG=avancer;
 		speedD=speedG=vit;
@@ -122,23 +126,18 @@ public class Activators implements Constantes {
         mD.close();
         mG.endSynchronization();
     }
-
-    public void avancerJusquaCouleur(Color c) {
-    	//Faire pour les autres trucs qu'une couleur (quand on en aura besoin on rajoute)
-    	while (Sensors.getLastColor()!=c) {
-    		Avancer(100000);
-    	}
-    }
     
 	private int distanceParcourue = 0;
 	public boolean reached(int dist) {
 		calcDistParcourue();
-		return dist>=distanceParcourue;
+		return dist<=distanceParcourue;
 	}
 	private void calcDistParcourue() {
-	    int g = mG.getTachoCount()-lastTachoG;
-	    int d = mD.getTachoCount()-lastTachoD;
-	    distanceParcourue+=(((3.14*57/360)*2*(g+d)/2)/2);// (2*PI*r/360) *degres parcourus 
+	    int g = Math.abs(mG.getTachoCount());
+	    int d = Math.abs(mD.getTachoCount()); 
+	    distanceParcourue+=(((Math.PI*57/360)*2*(g+d)/2)/2);// (2*PI*r/360) *degres parcourus
+		mG.resetTachoCount();
+		mD.resetTachoCount();
 	}
 	public void resetDist() {
 		distanceParcourue=0;

@@ -8,8 +8,7 @@ public class TouchTest implements Tester{
 		this.s=s;
 	}
 	@Override
-	public boolean test() {
+	public boolean test() {	
 		return s.isTouch();
 	}
-
 }

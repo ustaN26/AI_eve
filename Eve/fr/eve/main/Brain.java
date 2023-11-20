@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import fr.eve.main.Detectable.Type;
+import fr.eve.main.Sensors.Color;
+import fr.eve.main.tester.ColorTest;
+import fr.eve.main.tester.DistanceTest;
+import fr.eve.main.tester.Tester;
+import fr.eve.main.tester.TouchTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
@@ -147,27 +152,31 @@ public class Brain implements Constantes{
 		AcheminerPalet;
 	}
 
-    private void avancerjusqua(boolean test) {
-        while(test) {
-        	try { Thread.sleep(1);
+	public static void avancerjusqua(Tester t) {
+        while(!t.test()) {
+        	try { Thread.sleep(10);
 			} catch (InterruptedException ignored) {}
         }
     }
+
 	private void premierPalet() {
 		activators.move(true);
-    activators.ouverturePince(true);
-    avancerjusqua(sensors.isTouch());
-    activators.ouverturePince(false);
-    activators.rotationRapide(45);
-    avancerjusqua(activators.reached(20));
-    activators.resetDist();
-    activators.rotationRapide(-45);
-    avancerjusqua(activators.reached(20));
-    activators.resetDist();
-    activators.droitDevant();
-    avancerjusqua(activators.reached(110));
-    activators.resetDist();
-    activators.stop();
+	    activators.ouverturePince(true);
+	    avancerjusqua(new TouchTest(sensors));
+	    activators.ouverturePince(false);
+		activators.move(false);
+	    activators.rotationRapide(45);
+		activators.move(true);
+	    avancerjusqua(new DistanceTest(200, activators));
+	    activators.resetDist();
+		activators.move(false);
+	    activators.rotationRapide(-45);
+	    activators.resetDist();
+		activators.move(true);
+	    activators.droitDevant();
+	    avancerjusqua(new ColorTest(Color.WHITE,sensors));
+	    activators.resetDist();
+	    activators.stop();
 	}
 	protected void marquerPalet() {
 		

@@ -13,7 +13,6 @@ import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
 public class TestPremierPalet implements Constantes{
@@ -34,42 +33,39 @@ public class TestPremierPalet implements Constantes{
 			@Override
 			public void keyPressed(Key k) {}
 		});
-        activators.ouverturePince(true);
-        try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-        activators.ouverturePince(false);
-		//premierPalet();    	
+		premierPalet();    	
 	}
     public static void avancerjusqua(Tester t) {
-        while(t.test()) {
-        	try { Thread.sleep(1);
+        while(!t.test()) {
+        	try { Thread.sleep(100);
 			} catch (InterruptedException ignored) {}
         }
     }
 	private void premierPalet() {
-		activators.synch(true);
-        activators.ouverturePince(true);
 		activators.move(true);
-        avancerjusqua(new TouchTest(sensors));
-        activators.ouverturePince(false);
-        activators.rotationRapide(45);
-        avancerjusqua(new DistanceTest(20, activators));
-        activators.resetDist();
-        activators.rotationRapide(-45);
-        avancerjusqua(new ColorTest(Color.WHITE));
-        activators.resetDist();
-        activators.stop();
-        marquerPalet();
+	    activators.ouverturePince(true);
+	    avancerjusqua(new TouchTest(sensors));
+	    activators.ouverturePince(false);
+		activators.move(false);
+	    activators.rotationRapide(45);
+		activators.move(true);
+	    avancerjusqua(new DistanceTest(200, activators));
+	    activators.resetDist();
+		activators.move(false);
+	    activators.rotationRapide(-45);
+	    activators.resetDist();
+		activators.move(true);
+	    activators.droitDevant();
+	    avancerjusqua(new ColorTest(Color.WHITE,sensors));
+	    activators.resetDist();
+	    activators.stop();
 	}
 	private void marquerPalet() {
         activators.ouverturePince(true);
         Delay.msDelay(1000);
         activators.move(false);
         while(activators.reached(10)) {
-        	try { Thread.sleep(1);
+        	try { Thread.sleep(10);
 			} catch (InterruptedException ignored) {}
         }
         activators.resetDist();

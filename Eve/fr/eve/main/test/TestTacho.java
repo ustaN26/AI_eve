@@ -1,9 +1,8 @@
 package fr.eve.main.test;
 
+import java.io.FileOutputStream;
 import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
-import fr.eve.main.EVE;
-import fr.eve.main.Sensors;
 import fr.eve.main.tester.DistanceTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
@@ -12,10 +11,11 @@ import lejos.hardware.KeyListener;
 
 public class TestTacho implements Constantes{
 	private Activators activators;
-	private Sensors sensors;
+	public static FileOutputStream file;
+	//private Sensors sensors;
 	
 	public static void main(String[] args) {
-		new TestTacho().test(); 
+		new TestTacho().test();
 	}
 	public void test() {
 		activators = new Activators();
@@ -29,16 +29,20 @@ public class TestTacho implements Constantes{
 			@Override
 			public void keyPressed(Key k) {}
 		});
+		System.out.println("start");
 		test2();
+		System.exit(0);
 	}
 	public void test2() {
+		activators.resetDist();
 		mG.setAcceleration(720);
 		mD.setAcceleration(720);
 		activators.move(true);
-        TestPremierPalet.avancerjusqua(new DistanceTest(1200, activators));
+        TestPremierPalet.avancerjusqua(new DistanceTest(2400, activators));
         activators.stop();
+        System.out.println("STOPPP");
 	}
-	public void test1() {
+	/*public void test1() {
 		int time = 0;
 		mG.resetTachoCount();
 		while(time<=100) {
@@ -51,5 +55,5 @@ public class TestTacho implements Constantes{
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }

@@ -1,12 +1,8 @@
-/.classpath
-/.project
-/.settings/
-/Test.jar
-/TestColo.jar
-/TestDetect.jar
-/TestEve.jar
-/TestPince.jar
 /TestPremierPalet.jar
+/TestTacho.jar
 /fr/
 /schemaDetectionPallet.png
 /testDeplacementSynch.jar
+/TestColor.jar
+/TestPince.jar
+/TestTouch.jar

@@ -17,5 +17,4 @@ public class DistanceTest implements Tester{
 		System.out.println(a.dist()+"  "+a.mG.getTachoCount());
 		return r;
 	}
-
 }
