@@ -22,11 +22,8 @@ public class Brain implements Constantes{
 	public Sensors getSensor() {
 		return sensors;
 	}
-	private Thread brainThread;
-	private Etats state;
 
 	public Brain() {
-		state = Etats.PremierPalet;
 		activators = new Activators();
 		sensors = new Sensors();
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
@@ -37,39 +34,7 @@ public class Brain implements Constantes{
 			@Override
 			public void keyPressed(Key k) {}
 		});
-		brainThread = new Thread() {
-			public void run() {
-				while(true) {
-					switch(state) {
-					case PremierPalet:
-						premierPalet();
-					case MarquerPalet:
-						marquerPalet();
-						break;
-					case AcheminerPalet :
-						acheminerPalet();
-						break;
-					case DetectPalet :
-						detectPalet(detection360());
-						break;
-					default:
-						break;
-					}
-					try { Thread.sleep(1);
-					} catch (InterruptedException ignored) {}	
-				}
-			}
-		};
-		brainThread.start();
-		while(true);
-	}
-
-	private static enum Etats {
-		PremierPalet,
-		MarquerPalet,
-		DetectPalet,
-		PrendrePalet,
-		AcheminerPalet;
+		premierPalet();
 	}
 
 	public static void avancerjusqua(Tester t) {
@@ -105,6 +70,7 @@ public class Brain implements Constantes{
 		activators.move(false);
 		TestPremierPalet.avancerjusqua(new DistanceTest(150,activators));
 		activators.rotationRapide(180);
+		chercherPalet();
 	}
 	private void chercherPalet() {//ou attraper palet
 		avancerjusqua(new DistanceTest((int)(sensors.getData()*100-20), activators));

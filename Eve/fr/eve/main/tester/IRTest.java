@@ -14,5 +14,4 @@ public class IRTest implements Tester {
 		return (s.getData()*100>distDMD);
 		//demander au sensor quelle distance c'est (distance detectée plus petite que demandée)
 	}
-
 }
