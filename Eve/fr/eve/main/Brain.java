@@ -7,6 +7,7 @@ import fr.eve.main.tester.DistanceTest;
 import fr.eve.main.tester.IRTest;
 import fr.eve.main.tester.Tester;
 import fr.eve.main.tester.TouchTest;
+import fr.eve.mainold.Deplacement;
 import fr.eve.main.test.TestPremierPalet;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
@@ -16,7 +17,7 @@ import lejos.utility.Delay;
 
 public class Brain implements Constantes{
 	private Activators activators;
-	private Sensors sensors;
+	private static Sensors sensors;
 
 	public Sensors getSensor() {
 		return sensors;
@@ -29,7 +30,7 @@ public class Brain implements Constantes{
 		activators = new Activators();
 		sensors = new Sensors();
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
-			@Override // boutton arret d'urgance
+			@Override // bouton  arret d'urgance
 			public void keyReleased(Key k) {
 				System.exit(0);
 			}
@@ -46,10 +47,10 @@ public class Brain implements Constantes{
 						marquerPalet();
 						break;
 					case AcheminerPalet :
-						AcheminerPalet();
+						acheminerPalet();
 						break;
 					case DetectPalet :
-						detecterPalet();
+						detectPalet(detection360());
 						break;
 					default:
 						break;
@@ -59,8 +60,8 @@ public class Brain implements Constantes{
 				}
 			}
 		};
-		brainThread.start();
-		while(true);
+		//brainThread.start();
+		//x	while(true);
 	}
 
 	private static enum Etats {
@@ -83,50 +84,60 @@ public class Brain implements Constantes{
 		activators.ouverturePince(true);
 		avancerjusqua(new TouchTest(sensors));
 		activators.ouverturePince(false);
-		activators.move(false);
+		activators.stop();
 		activators.rotationRapide(45);
 		activators.move(true);
 		avancerjusqua(new DistanceTest(200, activators));
 		activators.resetDist();
-		activators.move(false);
+		activators.stop();
 		activators.rotationRapide(-45);
 		activators.resetDist();
 		activators.move(true);
 		activators.droitDevant();
-		//TODO avancer jusqua mur
+		avancerjusqua(new IRTest(30,sensors));
 		activators.resetDist();
 		activators.stop();
 	}
 	protected void marquerPalet() {
-		TestPremierPalet.avancerjusqua(new IRTest(2, sensors));//on verra pour la distance
+		activators.move(true);
+		TestPremierPalet.avancerjusqua(new IRTest(0.19f, sensors));//(0.18m)
 		activators.ouverturePince(true);
 		activators.move(false);
 		TestPremierPalet.avancerjusqua(new DistanceTest(150,activators));
 		activators.rotationRapide(180);
 	}
-	private void AcheminerPalet() {
+	private void chercherPalet() {//ou attraper palet
+		avancerjusqua(new DistanceTest((int)(sensors.getData()*100-20), activators));
+		activators.ouverturePince(true);
+		avancerjusqua(new TouchTest(sensors));
+		activators.ouverturePince(false);
+		activators.stop();
+		acheminerPalet();
+	}
+	private void acheminerPalet() {
+		activators.droitDevant();
+		activators.move(true);//TODO voir si ya des obstacles droit devant à eventuellement esquiver
 
 	}
-	protected void detecterPalet() {
-	}
-
-	public void detection360() throws IOException{
-		String s="";
-		FileOutputStream f=new FileOutputStream("valeur.txt");
-		mG.setSpeed(130); //125 pour 31700
-		mD.setSpeed(130);
-		activators.synch(true);
-		mG.forward();
-		mD.backward();
-		activators.synch(false);
+	
+	public float[] detection360() {
 		float g=0;
 		int nbVal=0;
+		float[] valAngle=new float[360];
+		mG.setAcceleration(520);
+		mD.setAcceleration(520);
+		mG.setSpeed(180); //125 pour 31700
+		mD.setSpeed(180);
+		mG.startSynchronization();
+		mG.rotate((int) (360*2.16));
+		mD.rotate((int) (-360*2.16));
 		for(int i=0;i<360;i++) {
 			for(int j=0;j<20;j++) {
 				float t= sensors.getData();
-				if(t<3) 
+				if(t<3) {
 					g+=t;
-				nbVal++;
+					nbVal++;
+				}
 			}
 			if(g==0) {
 				g=3;
@@ -134,62 +145,49 @@ public class Brain implements Constantes{
 			else {
 				g=g/nbVal;
 			}
-			s =""+ g;
-			f.write((s+"\n").getBytes());
+			valAngle[i]=g;
 			g=0;
 			nbVal=0;
-			Delay.usDelay(12000);
-		}
-		activators.synch(true);
-		mG.stop();
-		mD.stop();
-		activators.synch(false);
-		f.flush();
-		f.close();
+			Delay.usDelay(4200);
+		}  
+		mG.waitComplete();
+		mD.waitComplete();
+		mG.endSynchronization();
+		return valAngle;
 	}
-
-	public float[] tabValeur() throws IOException {
-		float[] valeur= new float[360];
-		FileInputStream f=new FileInputStream("valeur.txt");
-		for(int i=0;i<360;i++) {
-			valeur[i]=f.read();
-		}
-		f.close();
-		return valeur;
-	}
-
-	public int detectPalet(float[] dist) { 
-		/*programme qui va détecter les écarts 
-		 * entre la valeur de distance demandée et la valeur 
-		 * détectée afin de detecter la presence d'un palet
-		 */
-		int compteur=0,i=0,j=0;
-		int indiceDebut=0;
-		float a,b;
-		for ( i=0; i<dist.length;i++) {
-			if (dist[i]-dist[i+1]<0.2 && dist[i+1]<dist[i]) {
-				a=dist[i]-dist[i+1];
+	public int detectPalet(float[] dist) {
+		int indiceDebut=0, indiceFin=0, anglePalet=0; 
+		float distancePalet=3;
+		for (int i=0; i<dist.length-1; i++) {
+			if ( Math.abs(dist[i]-dist[i+1])>0.05 && dist[i+1]<dist[i] ) {
 				indiceDebut=i+1;
-
-				for (j=i; j<dist.length;j++)
-					if (dist[j]-dist[j+1]<0.2 && dist[j+1]>dist[j]) {
-						b=dist[j]-dist[j+1];
-						if (a==b && (i-j<50) && (i-j>10))
-							for (int k = i; k<j; k++) {
-								if (dist[k]>dist[i+1]+0.07 && dist[k]<=dist[j])
-									compteur++;
-							}
-					}
+			}
+			if (Math.abs(dist[i]-dist[i+1])>0.05 && dist[i+1]>dist[i]){
+				indiceFin=i;
+			}
+			if (indiceDebut<indiceFin && indiceDebut>=indiceFin-50) {
+				int compteur=0;
+				for (int k=indiceDebut; k<indiceFin; k++){
+					if (dist[k]<dist[indiceDebut] && dist[k]<dist[indiceFin])
+						compteur++;
+				}
+				if (compteur> (indiceDebut-indiceFin)*0.8 && dist[(indiceDebut+indiceFin)/2]<distancePalet){
+					anglePalet=(indiceDebut+indiceFin)/2;
+					distancePalet=dist[(indiceDebut+indiceFin)/2];
+				}
 			}
 		}
-		if (compteur>30 && compteur<50)
-			return (i+j)/2;
-		else return -1;
+		return anglePalet;
+	}
+
+	public static void main(String[] args) {
+		Brain a=new Brain();
+		int i=a.detectPalet(a.detection360());
+		System.out.println(i);
+		Delay.msDelay(4000);
+		System.exit(0);
 	}
 }
-
-
-
 
 
 

@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-/TestPremierPalet.jar
-/TestTacho.jar
 /fr/
-/schemaDetectionPallet.png
-/testDeplacementSynch.jar
-/TestColor.jar
-/TestPince.jar
-/TestTouch.jar
-=======
-/fr/
->>>>>>> 191a376908a04f8d1e9d7fbea4fcfaf706efcdfe
+/Brain.jar
+/Sensors.jar

@@ -14,7 +14,7 @@ public class Activators implements Constantes {
 	public Activators() {
 		boolean ok = false;
 		int essais = 0;
-		while(ok) {
+		while(!ok) {
 			try {
 				mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD }); // synchronise le moteur 1 avec le moteur 2(qui est un element d'un tableau de moteur)
 				ok=true;

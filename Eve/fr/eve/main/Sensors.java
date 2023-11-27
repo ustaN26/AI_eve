@@ -3,6 +3,7 @@ package fr.eve.main;
 import java.util.ArrayList;
 import java.util.List;
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class Sensors implements Constantes{
 	private boolean touch;
@@ -17,6 +18,7 @@ public class Sensors implements Constantes{
         sampleProvider.fetchSample(sample, 0); 
         return sample[0];
     }
+	
 	public Sensors() {
 		touchListener(false);
 		Thread flagTask = new Thread() {
