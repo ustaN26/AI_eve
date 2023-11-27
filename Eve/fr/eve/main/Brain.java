@@ -133,6 +133,7 @@ public class Brain implements Constantes{
 				t += dists.get(i*nbVal+j);
 			}
 			t/=nbVal;
+			tabVal.add(t);
 		}
 		sensors.resetDistBuffer();
 		float[] floats = new float[tabVal.size()];

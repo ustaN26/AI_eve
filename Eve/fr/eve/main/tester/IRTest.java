@@ -9,8 +9,6 @@ public class IRTest implements Tester {
 		s = s2;
 	}
 	
-	
-
 	@Override
 	public boolean test() {
 		return (s.getData()*100>distDMD);
