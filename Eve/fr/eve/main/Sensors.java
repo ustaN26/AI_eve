@@ -11,6 +11,7 @@ public class Sensors implements Constantes{
 	
 	private final List<Float> distBuffer = new ArrayList<>();
 	public List<Float> getDistBuffer() { return distBuffer;}
+	private boolean detect = false;
 	
 	public float getData() {
         SampleProvider sampleProvider=usSensor.getDistanceMode();
@@ -26,8 +27,8 @@ public class Sensors implements Constantes{
 				while(true) {
 					if(isPressed()!=touch)
 						touchListener(isPressed());
-		            try { Thread.sleep(1);
-					} catch (InterruptedException ignored) {}
+					if(detect)
+						distBuffer.add(getData());
 				}
 			}
 		};
@@ -40,6 +41,14 @@ public class Sensors implements Constantes{
 	}
 	private void touchListener(boolean b) {
 		touch = b;
+	}
+
+	public void resetDistBuffer() {
+		distBuffer.clear();
+	}
+
+	public void setDetect(boolean b) {
+		detect = b;
 	}
 }
 

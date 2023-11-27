@@ -1,5 +1,6 @@
-package fr.eve.main;
+package fr.eve.main.test;
 
+import fr.eve.main.Constantes;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.utility.Delay;
 
