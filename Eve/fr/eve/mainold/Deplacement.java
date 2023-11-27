@@ -52,11 +52,10 @@ public class Deplacement {
 		Avancer(5000);
 	}
 
-	public static void RotationRapide(int angle) {
-		mG.synchronizeWith(new EV3LargeRegulatedMotor[] { mD });
+	public static void rotationRapide(int angle) {
 		mG.startSynchronization();
-		mG.rotate(angle);
-		mD.rotate(-angle);
+		mG.rotate((int) (angle*2.16));
+		mD.rotate((int) (-angle*2.16));
 		mG.endSynchronization();
 		mG.waitComplete();
 		mD.waitComplete();
@@ -64,7 +63,7 @@ public class Deplacement {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		RotationRapide(800);
+		rotationRapide(800);
 	}
 
 }

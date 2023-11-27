@@ -13,7 +13,7 @@ public class IRTest implements Tester {
 
 	@Override
 	public boolean test() {
-		return (s.getData()>distDMD);
+		return (s.getData()*100>distDMD);
 		//demander au sensor quelle distance c'est (distance detectée plus petite que demandée)
 	}
 
