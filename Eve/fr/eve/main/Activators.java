@@ -1,18 +1,14 @@
 package fr.eve.main;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.utility.Delay;
 
 public class Activators implements Constantes {
-	private float speedG=0, speedD=0;
-	private boolean dirG=true, dirD=true, synch=false;
-	private Thread moveTask, pinceTask;
+	private Thread pinceTask;
 	private boolean etatPince = false, ordrePince = false;//true = open; false = close
-	private int lastTachoG=0, lastTachoD=0;
 	private int boussole=0;
-	
+
 	public Activators() {
-		boolean ok = false;
+		boolean ok = true;
 		int essais = 0;
 		while(!ok) {
 			try {
@@ -29,81 +25,47 @@ public class Activators implements Constantes {
 				}
 			}
 		}
-	    moveTask = new Thread("moveTask") {
-			public void run() {
-				while(true) {
-					if(synch) {
-						mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
-				        mG.setSpeed(speedG);
-						mD.setSpeed(speedD);
-						if(dirG) mG.forward();
-						else mG.backward();
-						if(dirD) mD.forward();
-						else mD.backward();
-						mG.endSynchronization();
-						calcDistParcourue();
-					}
-					try { Thread.sleep(1);
-					} catch (InterruptedException ignored) {}
-				}
-			};
-		};
-		pinceTask = new Thread("pinceTask") {
-			public void run() {
-				while(true) {
-					if(etatPince!=ordrePince) {
-						if (ordrePince) {
-							mP.rotate(900);
-							etatPince=true;
-						}else{
-							mP.rotate(-900);
-							etatPince=false;
-						} 
-					}
-					try { Thread.sleep(1);
-					} catch (InterruptedException ignored) {}
-				}
-			};
-		};
-		moveTask.start();
-		pinceTask.start();
-	}
-	public void synch(boolean s) {
-		this.synch=s;
 	}
 	public void stop() {
-		picoMove(true, 0);
-		synch(false);
-		mG.startSynchronization();    //demarre la synchronisation (des commandes ) des moteurs synchronisés avec le moteur 1
+		mG.startSynchronization();
 		mG.stop();
 		mD.stop();
 		mG.endSynchronization();
+		//mG.close();
+		//mD.close(); //TODO c'etait utilisé dans avancer(temps)
 	}
-	public void move(boolean dir) {
-		synch(true);
-		picoMove(dir, maxSpeed);
+	public void move(boolean direction) {
+		mD.setAcceleration(720);//TODO
+		mG.setAcceleration(720);//TODO
+		mD.setSpeed(720);
+		mG.setSpeed(720);
+		mG.startSynchronization();
+		if(direction) {
+			mD.forward();
+			mG.forward();
+		}else {
+			mD.backward();
+			mG.backward();
+		}
+		mG.endSynchronization();
+	}
+
+	public void rotationRapide(int angle) {
+		boussole=(boussole+angle)%360;
+		mG.setAcceleration(720);
+		mD.setAcceleration(720);
+		mG.startSynchronization();
+		mG.rotate((int)(angle*2.16));
+		mD.rotate((int)(-angle*2.16));
+		mG.endSynchronization();
+		mG.waitComplete();
+		mD.waitComplete();
+	}
+
+	public void droitDevant() {
+		rotationRapide(-boussole);
 	}
 	
-    public void rotationRapide(int angle) {//TODO vrai angle
-    	boussole=(boussole+angle)%360;
-    	mG.setAcceleration(720);
-		mD.setAcceleration(720);
-    	mG.startSynchronization();
-    	mG.rotate((int)(angle*2.16));
-		mD.rotate((int)(-angle*2.16));
-        mG.endSynchronization();
-        mG.waitComplete();
-        mD.waitComplete();
-    }
-    
-    public void droitDevant() {
-    	rotationRapide(-boussole);
-    }
-        
-	public void picoMove(boolean avancer, float vit) {
-		dirD=dirG=avancer;
-		speedD=speedG=vit;
-	}
 	/*
 	 * Manipule l'ouverture des pinces, ne permet pas de faire la même action deux d'affiler
 	 * PinceOuverte(True) : Ouvre les pinces
@@ -114,35 +76,36 @@ public class Activators implements Constantes {
 	 */
 	public void ouverturePince(boolean b) {
 		ordrePince = b;
+		pinceTask = new Thread("pinceTask") {
+			public void run() {
+				mP.setSpeed(mP.getMaxSpeed());
+				if(etatPince!=ordrePince) {
+					if (ordrePince) {
+						mP.rotate(900);
+						etatPince=true;
+					}else{
+						mP.rotate(-900);
+						etatPince=false;
+					} 
+				}
+			}
+		};
+		pinceTask.start();
 	}
-    public void Avancer(int temps) {//temps en millisecondes 
-    	mG.startSynchronization();
-        mG.forward();
-        mD.forward();
-        mG.endSynchronization();
-        Delay.msDelay(temps);
-    	mG.startSynchronization();
-        mG.close();
-        mD.close();
-        mG.endSynchronization();
-    }
-    
+
 	private int distanceParcourue = 0;
 	public boolean reached(int dist) {
 		calcDistParcourue();
 		return dist<=distanceParcourue;
 	}
 	private void calcDistParcourue() {
-	    int g = Math.abs(mG.getTachoCount());
-	    int d = Math.abs(mD.getTachoCount()); 
-	    distanceParcourue+=(((Math.PI*57/360)*2*(g+d)/2)/2);// (2*PI*r/360) *degres parcourus
+		int g = Math.abs(mG.getTachoCount());
+		int d = Math.abs(mD.getTachoCount()); 
+		distanceParcourue+=(((Math.PI*57/360)*(g+d)/2));// (2*PI*r/360) *degres parcourus
 		mG.resetTachoCount();
 		mD.resetTachoCount();
 	}
 	public void resetDist() {
 		distanceParcourue=0;
-	}
-	public int dist() {
-		return distanceParcourue;
 	}
 }

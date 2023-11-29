@@ -2,16 +2,24 @@ package fr.eve.main;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.eve.main.Brain.Etats;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class Sensors implements Constantes{
+	private long clock = 150000;//2min30
+	
 	private boolean touch;
 	public boolean isTouch() { return touch;}
 	
 	private final List<Float> distBuffer = new ArrayList<>();
 	public List<Float> getDistBuffer() { return distBuffer;}
 	private boolean detect = false;
+	private float lastUS;
+	private Thread sensorTask;
+	public Thread getThread() { return sensorTask; }
+	
 	
 	public float getData() {
         SampleProvider sampleProvider=usSensor.getDistanceMode();
@@ -20,19 +28,28 @@ public class Sensors implements Constantes{
         return sample[0];
     }
 	
-	public Sensors() {
+	public Sensors(final Brain brain) {
 		touchListener(false);
-		Thread flagTask = new Thread() {
+		lastUS = getData();
+		sensorTask = new Thread() {
 			public void run() {
 				while(true) {
+					if(System.currentTimeMillis()>clock)
+						brain.endGame();
 					if(isPressed()!=touch)
 						touchListener(isPressed());
+					float ir = getData();
+					if(brain.getState()!=Brain.Etats.detectionDuPalet && lastUS-ir>0.2 && ir<0.20)
+						//TODO a tester en fonction de la vitesse de depla
+				//si ecart entre dernier vu et vu actuel => obstacle
+				//si obstacle a moins de 20 cm esquive
+						brain.esquive();
 					if(detect)
-						distBuffer.add(getData());
+						distBuffer.add(ir);
 				}
 			}
 		};
-		flagTask.start();
+		sensorTask.start();
 	}
 	protected boolean isPressed() {
 		float[] sample = new float[1];

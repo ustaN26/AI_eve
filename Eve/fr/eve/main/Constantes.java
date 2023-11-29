@@ -17,10 +17,10 @@ public interface Constantes {
 	final float maxSpeed = 600f;
 	
 	final EV3TouchSensor touchSensor = new EV3TouchSensor(SensorPort.S2);
+	
 	final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
 	final SampleProvider sp = usSensor.getDistanceMode();
 	final float [] sample = new float[sp.sampleSize()];
-	final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S4);
 	
 	final float maxUltrasonStep = 0.05f;
 	final float intervalDetectionCoef = 0.5f;

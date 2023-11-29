@@ -20,7 +20,7 @@ public class TestTouch implements Constantes{
 		new TestTouch().test();
 	}
 	public void test() {
-		Sensors sensors = new Sensors();
+		Sensors sensors = new Sensors(null);
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
 			@Override // boutton arret d'urgance
 			public void keyReleased(Key k) {

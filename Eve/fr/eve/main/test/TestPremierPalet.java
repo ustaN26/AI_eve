@@ -1,7 +1,6 @@
 package fr.eve.main.test;
 import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
-import fr.eve.main.EVE;
 import fr.eve.main.Sensors;
 import fr.eve.main.tester.DistanceTest;
 import fr.eve.main.tester.Tester;
@@ -20,8 +19,7 @@ public class TestPremierPalet implements Constantes{
 	}
 	public void test() {
 		activators = new Activators();
-		sensors = new Sensors();
-		EVE.start();
+		sensors = new Sensors(null);
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
 			@Override // boutton arret d'urgance
 			public void keyReleased(Key k) {

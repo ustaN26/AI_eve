@@ -1,91 +1,138 @@
 package fr.eve.main;
 
 import fr.eve.main.tester.DistanceTest;
-import fr.eve.main.tester.IRTest;
+import fr.eve.main.tester.USTest;
 import fr.eve.main.tester.Tester;
 import fr.eve.main.tester.TouchTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import fr.eve.main.test.TestPremierPalet;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
-import lejos.utility.Delay;
 
+
+@SuppressWarnings("deprecation")
 public class Brain implements Constantes{
 	private Activators activators;
 	private static Sensors sensors;
+	public Sensors getSensor() { return sensors; }
+	private Thread brainThread;
+	public Thread getThread() {	return brainThread;}
+	private Etats state;
+	public Etats getState() { return state; }
 
-	public Sensors getSensor() {
-		return sensors;
-	}
-
+	
 	public Brain() {
 		activators = new Activators();
-		sensors = new Sensors();
-		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
-			@Override // bouton  arret d'urgance
-			public void keyReleased(Key k) {
-				System.exit(0);
-			}
-			@Override
-			public void keyPressed(Key k) {}
-		});
-		premierPalet();
+		sensors = new Sensors(this);
+		waitForRestart();
+		while(getState()!=Etats.end) {
+			try {
+				Thread.sleep(1000000);//>2m30 pour pas encombrer le proco
+			} catch (InterruptedException ignored) {};
+		}
 	}
 
-	public static void avancerjusqua(Tester t) {
+	private void init() {
+		state = Etats.premierPalet;
+		brainThread = resetBrainThread();
+		//brainThread.start();
+	}
+
+	private Thread resetBrainThread() {
+		return new Thread() {
+			public void run() {
+				switch(state) {
+				case premierPalet:
+					premierPalet();
+				case marquerPalet:
+					marquerPalet();
+				case acheminerPalet :
+					acheminerPalet();
+				case detectionDuPalet:
+					detectionDuPalet();
+				case allerChercherPalet :
+					allerChercherPalet();
+				default:
+					break;
+				}
+			}
+		};
+	}
+
+	public static enum Etats {
+		premierPalet,
+		marquerPalet,
+		allerChercherPalet,
+		detectionDuPalet,
+		acheminerPalet,
+		end;
+	}
+
+	public void avancerjusqua(Tester t) {
+		activators.move(true);
 		while(!t.test()) {
 			try { Thread.sleep(10);
 			} catch (InterruptedException ignored) {}
 		}
+		activators.stop();
 	}
 
 	private void premierPalet() {
-		activators.move(true);
 		activators.ouverturePince(true);
 		avancerjusqua(new TouchTest(sensors));
 		activators.ouverturePince(false);
-		activators.stop();
 		activators.rotationRapide(45);
-		activators.move(true);
-		avancerjusqua(new DistanceTest(200, activators));
-		activators.resetDist();
-		activators.stop();
+		avancerjusqua(new DistanceTest(150, activators));
 		activators.rotationRapide(-45);
-		activators.resetDist();
-		activators.move(true);
-		activators.droitDevant();
-		avancerjusqua(new IRTest(30,sensors));
-		activators.resetDist();
-		activators.stop();
+		avancerjusqua(new USTest(19,sensors));
+		state = Etats.marquerPalet;
+		//marquerPalet();
 	}
 	protected void marquerPalet() {
 		activators.move(true);
-		TestPremierPalet.avancerjusqua(new IRTest(0.19f, sensors));//(0.18m)
+		TestPremierPalet.avancerjusqua(new USTest(19, sensors));//(0.18m)
 		activators.ouverturePince(true);
 		activators.move(false);
+		activators.resetDist();
 		TestPremierPalet.avancerjusqua(new DistanceTest(150,activators));
-		activators.rotationRapide(180);
-		chercherPalet();
+		activators.ouverturePince(false);
+		activators.stop();
+		state = Etats.detectionDuPalet;
+		//detectionDuPalet();
 	}
-	private void chercherPalet() {//ou attraper palet
+	private void detectionDuPalet() {
+		activators.rotationRapide(90);
+		activators.rotationRapide(detectPalet(detection360())-180);
+		state = Etats.allerChercherPalet;
+		allerChercherPalet();
+	}
+
+	private void allerChercherPalet() {//ou attraper palet
+		activators.move(true);
 		avancerjusqua(new DistanceTest((int)(sensors.getData()*100-20), activators));
 		activators.ouverturePince(true);
 		avancerjusqua(new TouchTest(sensors));
 		activators.ouverturePince(false);
 		activators.stop();
+		state = Etats.acheminerPalet;
 		acheminerPalet();
 	}
 	private void acheminerPalet() {
 		activators.droitDevant();
 		activators.move(true);
+		TestPremierPalet.avancerjusqua(new USTest(30, sensors));
+		activators.stop();
+		state = Etats.marquerPalet;
+		marquerPalet();
 	}
-	
-	public float[] detection360(){
+
+	public float[] detection360(){//TODO mettre a jour
 		List<Float> tabVal = new ArrayList<>();
 		sensors.resetDistBuffer();
 		sensors.setDetect(true);
@@ -96,7 +143,7 @@ public class Brain implements Constantes{
 		for(int i=0;i<360;i++){
 			float t = 0;
 			for(int j = i*nbVal;j<(i+1)*nbVal;j++) {
-				t += dists.get(i*nbVal+j);
+				t += dists.get(j);
 			}
 			t/=nbVal;
 			tabVal.add(t);
@@ -133,11 +180,70 @@ public class Brain implements Constantes{
 		return anglePalet;
 	}
 
+	public void esquive() {
+		try {
+			brainThread.stop();
+			brainThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		int rot = 45; 
+		activators.rotationRapide(rot);
+		if(sensors.getData()>0.25) {
+			activators.rotationRapide(-2*rot);
+			rot = -rot;
+		}
+		activators.move(true);
+		avancerjusqua(new DistanceTest(200, activators));
+		activators.resetDist();
+		activators.stop();
+		activators.rotationRapide(-rot);
+		activators.resetDist();
+		brainThread = resetBrainThread();
+		brainThread.start();
+	}
+
+	public void endGame() {
+		try {
+			brainThread.stop();
+			brainThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("temps écouler");
+		waitForRestart();//shutdown or continue
+	}
+
+	private void waitForRestart() {
+		final AtomicBoolean restart = new AtomicBoolean(false);
+		System.out.println("enter = restart / escape = stop");
+		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(Key k) {
+				restart.set(true);
+			}
+			@Override
+			public void keyPressed(Key k) {}
+		});
+		BrickFinder.getDefault().getKey(Button.ESCAPE.getName()).addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(Key k) {
+				System.exit(0);
+			}
+			@Override
+			public void keyPressed(Key k) {}
+		});
+		while(!restart.get()) {
+			try { Thread.sleep(1);
+			} catch (InterruptedException ignored) {}
+		}
+		BAU.bau(this);
+		init();
+	}
+
 	public static void main(String[] args) {
-		Brain a=new Brain();
-		int i=a.detectPalet(a.detection360());
-		System.out.println(i);
-		Delay.msDelay(4000);
+		Brain a = new Brain();
+		a.state = Etats.premierPalet;
 		System.exit(0);
 	}
 }
