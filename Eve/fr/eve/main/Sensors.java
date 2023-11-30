@@ -8,7 +8,12 @@ import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class Sensors implements Constantes{
-	private long clock = 150000;//2min30
+	private long clock;//2min30
+	public void resetClock() { clock = System.currentTimeMillis()+150000; }
+	private long pauseTime=0;
+	public void addPauseTime(long l) {
+		pauseTime+=l;
+	}
 	
 	private boolean touch;
 	public boolean isTouch() { return touch;}
@@ -29,12 +34,13 @@ public class Sensors implements Constantes{
     }
 	
 	public Sensors(final Brain brain) {
+		resetClock();
 		touchListener(false);
 		lastUS = getData();
 		sensorTask = new Thread() {
 			public void run() {
 				while(true) {
-					if(System.currentTimeMillis()>clock)
+					if(System.currentTimeMillis()-pauseTime>=clock)
 						brain.endGame();
 					if(isPressed()!=touch)
 						touchListener(isPressed());

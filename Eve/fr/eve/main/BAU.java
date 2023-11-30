@@ -35,6 +35,7 @@ public class BAU {
 
 	protected static void pause(Brain brain) {
 		brain.getThread().suspend();
+		long timePause = System.currentTimeMillis();
 		brain.getSensor().getThread().suspend();
 		final AtomicBoolean resume = new AtomicBoolean(false);
 		System.out.println("enter = resume / escape = stop");
@@ -58,6 +59,7 @@ public class BAU {
 			try { Thread.sleep(1);
 			} catch (InterruptedException ignored) {}
 		}
+		brain.getSensor().addPauseTime(System.currentTimeMillis()-timePause);
 		brain.getSensor().getThread().resume();
 		brain.getThread().resume();
 	}
