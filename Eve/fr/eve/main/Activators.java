@@ -1,6 +1,7 @@
 package fr.eve.main;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.utility.Delay;
 
 public class Activators implements Constantes {
 	private Thread pinceTask;
@@ -8,7 +9,7 @@ public class Activators implements Constantes {
 	private int boussole=0;
 
 	public Activators() {
-		boolean ok = true;
+		boolean ok = false;
 		int essais = 0;
 		while(!ok) {
 			try {
@@ -28,17 +29,15 @@ public class Activators implements Constantes {
 	}
 	public void stop() {
 		mG.startSynchronization();
-		mG.stop();
-		mD.stop();
+		mG.stop(true);
+		mD.stop(true);
 		mG.endSynchronization();
-		//mG.close();
-		//mD.close(); //TODO c'etait utilisé dans avancer(temps)
 	}
 	public void move(boolean direction) {
 		mD.setAcceleration(720);//TODO
 		mG.setAcceleration(720);//TODO
-		mD.setSpeed(720);
-		mG.setSpeed(720);
+		mD.setSpeed(maxSpeed);
+		mG.setSpeed(maxSpeed);
 		mG.startSynchronization();
 		if(direction) {
 			mD.forward();
@@ -50,16 +49,37 @@ public class Activators implements Constantes {
 		mG.endSynchronization();
 	}
 
+	public void moveTo(boolean direction, int dist) {
+		mD.setAcceleration(720);//TODO
+		mG.setAcceleration(720);//TODO
+		mD.setSpeed(maxSpeed);
+		mG.setSpeed(maxSpeed);
+		mG.startSynchronization();
+		if(direction) {
+			mD.forward();
+			mG.forward();
+		}else {
+			mD.backward();
+			mG.backward();
+		}
+		mG.endSynchronization();
+		Delay.msDelay(dist*40);// a 540 de vitesse le rapport distance et temps est : temps = distance*40
+	/*	mG.startSynchronization();
+		mG.close();
+		mD.close();
+		mG.endSynchronization();*/
+		
+	}
 	public void rotationRapide(int angle) {
 		boussole=(boussole+angle)%360;
 		mG.setAcceleration(720);
 		mD.setAcceleration(720);
+		mD.setSpeed(maxSpeed);
+		mG.setSpeed(maxSpeed);
 		mG.startSynchronization();
 		mG.rotate((int)(angle*2.16));
 		mD.rotate((int)(-angle*2.16));
 		mG.endSynchronization();
-		mG.waitComplete();
-		mD.waitComplete();
 	}
 
 	public void droitDevant() {
@@ -96,16 +116,22 @@ public class Activators implements Constantes {
 	private int distanceParcourue = 0;
 	public boolean reached(int dist) {
 		calcDistParcourue();
+		System.out.println(dist+" <= "+distanceParcourue);
 		return dist<=distanceParcourue;
 	}
 	private void calcDistParcourue() {
 		int g = Math.abs(mG.getTachoCount());
-		int d = Math.abs(mD.getTachoCount()); 
-		distanceParcourue+=(((Math.PI*57/360)*(g+d)/2));// (2*PI*r/360) *degres parcourus
+		distanceParcourue+=(((Math.PI*57/360)*g));// (2*PI*r/360) *degres parcourus
 		mG.resetTachoCount();
 		mD.resetTachoCount();
 	}
 	public void resetDist() {
 		distanceParcourue=0;
 	}
+	
+	public static void main(String[] args) {
+		Activators a = new Activators();
+		a.moveTo(true, 60);//2400 pour 60 cm donc x40
+	}
+	
 }

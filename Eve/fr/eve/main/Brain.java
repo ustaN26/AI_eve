@@ -19,6 +19,7 @@ import lejos.hardware.KeyListener;
 @SuppressWarnings("deprecation")
 public class Brain implements Constantes{
 	private Activators activators;
+	public Activators getActivator() { return activators; }
 	private static Sensors sensors;
 	public Sensors getSensor() { return sensors; }
 	private Thread brainThread;
@@ -26,10 +27,10 @@ public class Brain implements Constantes{
 	private Etats state;
 	public Etats getState() { return state; }
 
-	
 	public Brain() {
 		activators = new Activators();
 		sensors = new Sensors(this);
+		state = Etats.premierPalet;
 		waitForRestart();
 		while(getState()!=Etats.end) {
 			try {
@@ -41,7 +42,7 @@ public class Brain implements Constantes{
 	private void init() {
 		state = Etats.premierPalet;
 		brainThread = resetBrainThread();
-		//brainThread.start();
+		brainThread.start();
 	}
 
 	private Thread resetBrainThread() {
@@ -77,7 +78,7 @@ public class Brain implements Constantes{
 	public void avancerjusqua(Tester t) {
 		activators.move(true);
 		while(!t.test()) {
-			try { Thread.sleep(10);
+			try { Thread.sleep(1);
 			} catch (InterruptedException ignored) {}
 		}
 		activators.stop();
@@ -88,11 +89,13 @@ public class Brain implements Constantes{
 		avancerjusqua(new TouchTest(sensors));
 		activators.ouverturePince(false);
 		activators.rotationRapide(45);
-		avancerjusqua(new DistanceTest(150, activators));
-		activators.rotationRapide(-45);
-		avancerjusqua(new USTest(19,sensors));
+		activators.stop();
+		activators.moveTo(true, 20);
+		activators.stop();
+		activators.rotationRapide(-90);
+		activators.stop();
+		avancerjusqua(new USTest(25,sensors));
 		state = Etats.marquerPalet;
-		//marquerPalet();
 	}
 	protected void marquerPalet() {
 		activators.move(true);
@@ -100,28 +103,26 @@ public class Brain implements Constantes{
 		activators.ouverturePince(true);
 		activators.move(false);
 		activators.resetDist();
-		TestPremierPalet.avancerjusqua(new DistanceTest(150,activators));
+		activators.moveTo(true, 15);
 		activators.ouverturePince(false);
 		activators.stop();
 		state = Etats.detectionDuPalet;
-		//detectionDuPalet();
 	}
 	private void detectionDuPalet() {
 		activators.rotationRapide(90);
 		activators.rotationRapide(detectPalet(detection360())-180);
 		state = Etats.allerChercherPalet;
-		allerChercherPalet();
 	}
 
 	private void allerChercherPalet() {//ou attraper palet
 		activators.move(true);
-		avancerjusqua(new DistanceTest((int)(sensors.getData()*100-20), activators));
+		activators.moveTo(true,(int)(sensors.getData()*100-20));
 		activators.ouverturePince(true);
+		activators.stop();
 		avancerjusqua(new TouchTest(sensors));
 		activators.ouverturePince(false);
 		activators.stop();
 		state = Etats.acheminerPalet;
-		acheminerPalet();
 	}
 	private void acheminerPalet() {
 		activators.droitDevant();
@@ -129,7 +130,6 @@ public class Brain implements Constantes{
 		TestPremierPalet.avancerjusqua(new USTest(30, sensors));
 		activators.stop();
 		state = Etats.marquerPalet;
-		marquerPalet();
 	}
 
 	public float[] detection360(){//TODO mettre a jour
@@ -182,6 +182,7 @@ public class Brain implements Constantes{
 
 	public void esquive() {
 		try {
+			brainThread.suspend();
 			brainThread.stop();
 			brainThread.join();
 		} catch (InterruptedException e) {
@@ -205,6 +206,7 @@ public class Brain implements Constantes{
 
 	public void endGame() {
 		try {
+			brainThread.suspend();
 			brainThread.stop();
 			brainThread.join();
 		} catch (InterruptedException e) {
@@ -214,7 +216,7 @@ public class Brain implements Constantes{
 		waitForRestart();//shutdown or continue
 	}
 
-	private void waitForRestart() {
+	public void waitForRestart() {
 		final AtomicBoolean restart = new AtomicBoolean(false);
 		System.out.println("enter = restart / escape = stop");
 		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
@@ -242,14 +244,14 @@ public class Brain implements Constantes{
 	}
 
 	public static void main(String[] args) {
-		Brain a = new Brain();
-		a.state = Etats.premierPalet;
-		System.exit(0);
+		Brain b = new Brain();
 	}
+
+	
 }
 
 
 
-
+  
 
 

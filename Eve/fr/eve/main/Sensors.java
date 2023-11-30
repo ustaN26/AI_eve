@@ -49,7 +49,7 @@ public class Sensors implements Constantes{
 						//TODO a tester en fonction de la vitesse de depla
 				//si ecart entre dernier vu et vu actuel => obstacle
 				//si obstacle a moins de 20 cm esquive
-						brain.esquive();
+						;//brain.esquive();
 					if(detect)
 						distBuffer.add(ir);
 				}

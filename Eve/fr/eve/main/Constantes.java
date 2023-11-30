@@ -14,7 +14,7 @@ public interface Constantes {
 	
 	final EV3LargeRegulatedMotor mG = new EV3LargeRegulatedMotor(MotorPort.B);
 	final EV3LargeRegulatedMotor mD = new EV3LargeRegulatedMotor(MotorPort.C);
-	final float maxSpeed = 600f;
+	final float maxSpeed = 540f;
 	
 	final EV3TouchSensor touchSensor = new EV3TouchSensor(SensorPort.S2);
 	
