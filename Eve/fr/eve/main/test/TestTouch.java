@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import fr.eve.main.Activators;
 import fr.eve.main.Constantes;
 import fr.eve.main.Sensors;
-import fr.eve.main.tester.DistanceTest;
 import fr.eve.main.tester.TouchTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;

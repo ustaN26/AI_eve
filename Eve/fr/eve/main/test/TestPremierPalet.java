@@ -1,10 +1,12 @@
 package fr.eve.main.test;
 import fr.eve.main.Activators;
+import fr.eve.main.BAU;
 import fr.eve.main.Constantes;
 import fr.eve.main.Sensors;
-import fr.eve.main.tester.DistanceTest;
+import fr.eve.main.Brain.Etats;
 import fr.eve.main.tester.Tester;
 import fr.eve.main.tester.TouchTest;
+import fr.eve.main.tester.USTest;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
@@ -18,16 +20,9 @@ public class TestPremierPalet implements Constantes{
 		new TestPremierPalet().test(); 
 	}
 	public void test() {
-		activators = new Activators();
+		activators = new Activators(null);
 		sensors = new Sensors(null);
-		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
-			@Override // boutton arret d'urgance
-			public void keyReleased(Key k) {
-				System.exit(0);
-			}
-			@Override
-			public void keyPressed(Key k) {}
-		});
+		BAU.bau();
 		premierPalet();    	
 	}
     public static void avancerjusqua(Tester t) {
@@ -45,12 +40,12 @@ public class TestPremierPalet implements Constantes{
 	    activators.moveTo(true,20);
 	    activators.rotationRapide(-45);
 	    activators.droitDevant();
-	    activators.stop();
-	}
-	private void marquerPalet() {
-        activators.ouverturePince(true);
-        Delay.msDelay(1000);
-        activators.move(false);
-        activators.rotationRapide(180);
+	    avancerjusqua(new USTest(20, sensors));//(0.18m))
+		activators.stop();
+		activators.ouverturePince(true);
+		if(!activators.moveTo(false,20))
+			return;
+		activators.ouverturePince(false);
+		System.out.println("j'ai finie");
 	}
 }

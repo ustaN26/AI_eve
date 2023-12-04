@@ -1,30 +1,25 @@
 package fr.eve.main.test;
 
+import fr.eve.main.BAU;
 import fr.eve.main.Constantes;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
 
-public class TestPince implements Constantes{
-	//private Activators activators;
-	//private Sensors sensors;
-	
+public class TestPince implements Constantes{	
 	public static void main(String[] args) {
-		new TestPince().test(); 
+		BAU.bau();
+		//new TestPince().test();
+		try {
+			new TestPince().testThread();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
+
 	public void test() {
-		//activators = new Activators();
-		//sensors = new Sensors();
-		//EVE.start();
-		BrickFinder.getDefault().getKey(Button.ENTER.getName()).addKeyListener(new KeyListener() {
-			@Override // boutton arret d'urgance
-			public void keyReleased(Key k) {
-				System.exit(0);
-			}
-			@Override
-			public void keyPressed(Key k) {}
-		});
 		mP.rotate(-900);
 		try {
 			Thread.sleep(2000);
@@ -32,8 +27,38 @@ public class TestPince implements Constantes{
 			e.printStackTrace();
 		}
 		mP.rotate(900);
-		//activators.ouverturePince(false);
-		//premierPalet(); 
 	}
-
+	private Thread pinceTask;
+	private boolean ordrePince = false, etatPince = true;
+	private void testThread() throws InterruptedException {
+		ordrePince = false;
+		resetPinceTask();
+		pinceTask.start();
+		pinceTask.join();
+		ordrePince = true;
+		resetPinceTask();
+		pinceTask.start();
+		pinceTask.join();
+		ordrePince = false;
+		resetPinceTask();
+		pinceTask.start();
+		pinceTask.join();
+	}
+	public Thread resetPinceTask() {
+		pinceTask = new Thread("pinceTask") {
+			public void run() {
+				mP.setSpeed(mP.getMaxSpeed());
+				if(etatPince!=ordrePince) {
+					if (ordrePince) {
+						mP.rotate(900);
+						etatPince=true;
+					}else{
+						mP.rotate(-900);
+						etatPince=false;
+					} 
+				}
+			}
+		};
+		return pinceTask;
+	}
 }

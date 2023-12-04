@@ -101,20 +101,18 @@ public class Brain implements Constantes{
 		if(!avancerjusqua(new TouchTest(sensors)))
 			return;
 		activators.ouverturePince(false);
-		activators.rotationRapide(45);
-		if(!activators.moveTo(true, 20))
-			return;
-		activators.rotationRapide(-50);
+		//activators.rotationRapide(45);
+		//if(!activators.moveTo(true, 20))
+		//	return;
+		//activators.rotationRapide(-50);
 		System.out.println("fini premierpalet");
 		state = Etats.acheminerPalet;
 	}
 	
 	private void marquerPalet() {
 		System.out.println("je marque");
-		if(!avancerjusqua(new USTest(20, sensors)))//(0.18m))
-			return;
 		activators.ouverturePince(true);
-		if(!activators.moveTo(false,20))
+		if(!activators.moveTo(false,40))
 			return;
 		activators.ouverturePince(false);
 		System.out.println("j'ai fermé");
@@ -138,7 +136,7 @@ public class Brain implements Constantes{
 	private void acheminerPalet() {
 		System.out.println("je ramène le palet");
 		activators.droitDevant();
-		if(!avancerjusqua(new USTest(30, sensors)))
+		if(!avancerjusqua(new USTest(20, sensors)))
 			return;
 		state = Etats.marquerPalet;
 	}
@@ -260,7 +258,7 @@ public class Brain implements Constantes{
 			@Override
 			public void keyPressed(Key k) {}
 		});
-		BAU.bau(this);
+		BAU.bau();
 		init();
 	}
 
