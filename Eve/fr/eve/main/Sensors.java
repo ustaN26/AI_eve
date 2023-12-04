@@ -45,13 +45,11 @@ public class Sensors implements Constantes{
 					if(isPressed()!=touch)
 						touchListener(isPressed());
 					float ir = getData();
-					if(brain.getState()!=Brain.Etats.detectionDuPalet && lastUS-ir>0.2 && ir<0.20)
-						//TODO a tester en fonction de la vitesse de depla
-				//si ecart entre dernier vu et vu actuel => obstacle
-				//si obstacle a moins de 20 cm esquive
-						;//brain.esquive();
+					if(brain.getState()!=Brain.Etats.detectionDuPalet && lastUS-ir>0.1 && ir<0.20)
+						brain.esquive();
 					if(detect)
 						distBuffer.add(ir);
+					lastUS = ir;
 				}
 			}
 		};

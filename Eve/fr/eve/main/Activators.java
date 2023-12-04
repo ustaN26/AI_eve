@@ -1,14 +1,15 @@
 package fr.eve.main;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.utility.Delay;
 
 public class Activators implements Constantes {
+	private Brain brain;
 	private Thread pinceTask;
 	private boolean etatPince = false, ordrePince = false;//true = open; false = close
 	private int boussole=0;
 
-	public Activators() {
+	public Activators(Brain brain) {
+		this.brain = brain;
 		boolean ok = false;
 		int essais = 0;
 		while(!ok) {
@@ -26,6 +27,10 @@ public class Activators implements Constantes {
 				}
 			}
 		}
+		mD.setAcceleration(720);
+		mG.setAcceleration(720);
+		mD.setSpeed(maxSpeed);
+		mG.setSpeed(maxSpeed);
 	}
 	public void stop() {
 		mG.startSynchronization();
@@ -34,52 +39,42 @@ public class Activators implements Constantes {
 		mG.endSynchronization();
 	}
 	public void move(boolean direction) {
-		mD.setAcceleration(720);//TODO
-		mG.setAcceleration(720);//TODO
-		mD.setSpeed(maxSpeed);
-		mG.setSpeed(maxSpeed);
 		mG.startSynchronization();
 		if(direction) {
 			mD.forward();
 			mG.forward();
-		}else {
+		}else{
 			mD.backward();
 			mG.backward();
 		}
 		mG.endSynchronization();
 	}
 
-	public void moveTo(boolean direction, int dist) {
-		mD.setAcceleration(720);//TODO
-		mG.setAcceleration(720);//TODO
-		mD.setSpeed(maxSpeed);
-		mG.setSpeed(maxSpeed);
-		mG.startSynchronization();
-		if(direction) {
-			mD.forward();
-			mG.forward();
-		}else {
-			mD.backward();
-			mG.backward();
-		}
-		mG.endSynchronization();
-		Delay.msDelay(dist*40);// a 540 de vitesse le rapport distance et temps est : temps = distance*40
-	/*	mG.startSynchronization();
-		mG.close();
-		mD.close();
-		mG.endSynchronization();*/
-		
+	public boolean moveTo(boolean direction, int dist) {
+		move(direction);
+		long initDelay = System.currentTimeMillis();
+		while(System.currentTimeMillis()-initDelay<dist*40){
+			if(brain.getEsquiveInterrupt())
+				return false;
+		}// a 540 de vitesse le rapport distance et temps est : temps = distance*40
+		stop();
+		return true;
 	}
 	public void rotationRapide(int angle) {
 		boussole=(boussole+angle)%360;
-		mG.setAcceleration(720);
-		mD.setAcceleration(720);
-		mD.setSpeed(maxSpeed);
-		mG.setSpeed(maxSpeed);
 		mG.startSynchronization();
-		mG.rotate((int)(angle*2.16));
-		mD.rotate((int)(-angle*2.16));
+		if(angle>0){
+			mD.rotate((int)(angle*(-2.16)));
+			mG.rotate((int)(angle*2.16));
+		}
+		else{
+			mD.rotate((int)(angle*(-2.16)));
+			mG.rotate((int)(angle*2.16));
+		}
 		mG.endSynchronization();
+		mD.waitComplete();
+		mG.waitComplete();
+		stop();
 	}
 
 	public void droitDevant() {
@@ -112,26 +107,9 @@ public class Activators implements Constantes {
 		};
 		pinceTask.start();
 	}
-
-	private int distanceParcourue = 0;
-	public boolean reached(int dist) {
-		calcDistParcourue();
-		System.out.println(dist+" <= "+distanceParcourue);
-		return dist<=distanceParcourue;
-	}
-	private void calcDistParcourue() {
-		int g = Math.abs(mG.getTachoCount());
-		distanceParcourue+=(((Math.PI*57/360)*g));// (2*PI*r/360) *degres parcourus
-		mG.resetTachoCount();
-		mD.resetTachoCount();
-	}
-	public void resetDist() {
-		distanceParcourue=0;
-	}
 	
 	public static void main(String[] args) {
-		Activators a = new Activators();
-		a.moveTo(true, 60);//2400 pour 60 cm donc x40
+		Activators a = new Activators(null);
+		a.rotationRapide(-180);
 	}
-	
 }

@@ -41,29 +41,16 @@ public class TestPremierPalet implements Constantes{
 	    activators.ouverturePince(true);
 	    avancerjusqua(new TouchTest(sensors));
 	    activators.ouverturePince(false);
-		activators.move(false);
 	    activators.rotationRapide(45);
-		activators.move(true);
-	    avancerjusqua(new DistanceTest(200, activators));
-	    activators.resetDist();
-		activators.move(false);
+	    activators.moveTo(true,20);
 	    activators.rotationRapide(-45);
-	    activators.resetDist();
-		activators.move(true);
 	    activators.droitDevant();
-	    //avancerjusqua(new ColorTest(Color.WHITE,sensors));
-	    activators.resetDist();
 	    activators.stop();
 	}
 	private void marquerPalet() {
         activators.ouverturePince(true);
         Delay.msDelay(1000);
         activators.move(false);
-        while(activators.reached(10)) {
-        	try { Thread.sleep(10);
-			} catch (InterruptedException ignored) {}
-        }
-        activators.resetDist();
         activators.rotationRapide(180);
 	}
 }
