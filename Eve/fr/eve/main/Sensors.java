@@ -3,9 +3,7 @@ package fr.eve.main;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.eve.main.Brain.Etats;
 import lejos.robotics.SampleProvider;
-import lejos.utility.Delay;
 
 /**
  * Classe capteurs 

@@ -364,7 +364,7 @@ public class Brain implements Constantes{
 	public static void main(String[] args) {
 		while(true){
 			try{
-				Brain b = new Brain();
+				new Brain();
 			} catch(IllegalArgumentException ignored){}
 		}
 	}	
