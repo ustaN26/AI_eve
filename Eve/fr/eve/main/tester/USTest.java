@@ -11,9 +11,9 @@ public class USTest implements Tester {
 	 * @param dist : distance a atteindre
 	 * @param s : objet capteurs
 	 */
-	public USTest(float dist, Sensors s2) {
+	public USTest(float dist, Sensors s) {
 		distDMD=dist;
-		s = s2;
+		this.s = s;
 	}
 	
 	/**

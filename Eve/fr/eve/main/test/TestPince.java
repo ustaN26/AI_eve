@@ -14,7 +14,6 @@ public class TestPince implements Constantes{
 		try {
 			new TestPince().testThread();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
@@ -29,7 +28,7 @@ public class TestPince implements Constantes{
 		mP.rotate(900);
 	}
 	private Thread pinceTask;
-	private boolean ordrePince = false, etatPince = true;
+	private boolean ordrePince = false, etatPince = false;
 	private void testThread() throws InterruptedException {
 		ordrePince = false;
 		resetPinceTask();

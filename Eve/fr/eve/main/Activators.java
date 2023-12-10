@@ -2,12 +2,46 @@ package fr.eve.main;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Classe Activators 
+ * gere tout ce qui est lié aux moteurs
+ */
 public class Activators implements Constantes {
+	/** brain le programme principale */
 	private Brain brain;
+	
+	/**
+	 * Tache d'ouverture/fermeture de la pince asynchrone
+	 */
 	private Thread pinceTask;
-	private boolean etatPince = false, ordrePince = false;//true = open; false = close
+	/**
+	 * etat actuel de la pince
+	 * @true = ouvert ; @false = fermé
+	 * @see ordrePince
+	 */
+	private boolean etatPince = false;
+	/**
+	 * etat souhaité de la pince
+	 * @true = ouvert ; @false = fermé
+	 * @see etatPince
+	 */
+	private boolean ordrePince = false;
+	
+	/**
+	 * angle entre l'orientation du robot et l'axe du terrain
+	 * 0° pointe vers le but ennemi
+	 * variable mise à jour lorsque le robot fait une rotation 
+	 */
 	private int boussole=0;
 
+	/**
+	 * constructeur
+	 * @param brain le programme principale
+	 * 
+	 * creer le lien de synchronisation entre les moteurs et initialise leurs parametres
+	 * 
+	 * @exception arrete le programme si la synchronisation des moteurs echoue 5 fois
+	 */
 	public Activators(Brain brain) {
 		this.brain = brain;
 		boolean ok = false;
@@ -32,12 +66,23 @@ public class Activators implements Constantes {
 		mD.setSpeed(maxSpeed);
 		mG.setSpeed(maxSpeed);
 	}
+	
+	/**
+	 * arrete les moteurs de maniere synchronisé apres un move()
+	 * @see move()
+	 */
 	public void stop() {
 		mG.startSynchronization();
 		mG.stop(true);
 		mD.stop(true);
 		mG.endSynchronization();
 	}
+	/**
+	 * demarre les moteurs de maniere synchronisé
+	 * @param direction, @true = avant, @false = arriere
+	 * 
+	 * @see stop()
+	 */
 	public void move(boolean direction) {
 		mG.startSynchronization();
 		if(direction) {
@@ -50,6 +95,14 @@ public class Activators implements Constantes {
 		mG.endSynchronization();
 	}
 
+	/**
+	 * commande un déplacement sur une distance donnée, le temps de roulage est calculé avec empiriquement, minimisant l'erreur du aux accelerations au demarrage et à l'arret
+	 * 
+	 * @param direction, @true = avant, @false = arriere
+	 * @param dist : la distance en cm
+	 * 
+	 * @return false si une esquive est necessaire
+	 */
 	public boolean moveTo(boolean direction, int dist) {
 		move(direction);
 		long initDelay = System.currentTimeMillis();
@@ -60,34 +113,37 @@ public class Activators implements Constantes {
 		stop();
 		return true;
 	}
+	/**
+	 * Effectu une rotation avec les moteurs synchronisés et met à jour la bousolle
+	 * Le facteur "2.16" sert à minimiser l'erreur du aux accelerations au demarrage et à l'arret
+	 * @param angle : en degree 
+	 */
 	public void rotationRapide(int angle) {
 		boussole=(boussole+angle)%360;
 		mG.startSynchronization();
-		if(angle>0){
-			mD.rotate((int)(angle*(-2.16)));
-			mG.rotate((int)(angle*2.16));
-		}
-		else{
-			mD.rotate((int)(angle*(-2.16)));
-			mG.rotate((int)(angle*2.16));
-		}
+		mD.rotate((int)(angle*(-2.16)));
+		mG.rotate((int)(angle*2.16));
 		mG.endSynchronization();
 		mD.waitComplete();
 		mG.waitComplete();
 		stop();
 	}
-
+	
+	/**
+	 * tourne le robot vers le but adverse
+	 * @see boussole
+	 */
 	public void droitDevant() {
 		rotationRapide(-boussole);
 	}
 	
 	/*
-	 * Manipule l'ouverture des pinces, ne permet pas de faire la même action deux d'affiler
-	 * PinceOuverte(True) : Ouvre les pinces
-	 * PinceOuverte(False) : Ferme les pinces 
-	 * Aide au valeur du moter : 
-	 * Valeur dans les positifs ça va forward => Fermé vers ouverte
-	 * Valeur dans les négatifs ca va backward => Ouverte vers fermé
+	 * Manipule l'ouverture des pinces, ne permet pas de faire la même action deux fois d'affiler
+	 * PinceOuverte(True) : ordonne d'ouvrir les pinces
+	 * PinceOuverte(False) : ordonne de fermer les pinces 
+	 * Aide au valeur du moteur : 
+	 * Valeur dans les positifs forward => Fermé vers ouverte
+	 * Valeur dans les négatifs backward => Ouverte vers fermé
 	 */
 	public void ouverturePince(boolean b) {
 		ordrePince = b;
@@ -106,10 +162,5 @@ public class Activators implements Constantes {
 			}
 		};
 		pinceTask.start();
-	}
-	
-	public static void main(String[] args) {
-		Activators a = new Activators(null);
-		a.rotationRapide(-180);
 	}
 }

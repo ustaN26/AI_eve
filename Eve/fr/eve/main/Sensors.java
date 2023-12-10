@@ -49,7 +49,7 @@ public class Sensors implements Constantes{
 
 	/**
 	 * thread de la classe en boucle.
-	 * @see getThread()
+	 * @getter getThread()
 	 */
 	private Thread sensorTask;
 	public Thread getThread() { return sensorTask; }

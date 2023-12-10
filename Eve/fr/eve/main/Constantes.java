@@ -6,6 +6,11 @@ import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
+/**
+ * Classe Constantes 
+ * contiens les constantes essentiel du projet
+ * "implement Constant" pour y avoir acces
+ */
 public interface Constantes {
 	/** moteur pince */
 	final EV3LargeRegulatedMotor mP = new EV3LargeRegulatedMotor(MotorPort.A);
